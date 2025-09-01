@@ -151,6 +151,10 @@ const rolePermissionRoutes = require('./routes/rolePermissionRoutes');
 const permissionRoutes = require('./routes/permissionRoutes');
 const uploadRoutes = require('./routes/uploadRoutes'); // Add upload routes
 
+// Enhanced Multi-Tenant Management Routes
+const tenantDashboardRoutes = require('./routes/tenantDashboardRoutes');
+const superAdminRoutes = require('./routes/superAdminRoutes');
+
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/roles', roleRoutes);
@@ -181,6 +185,10 @@ app.use('/api/user-permissions', userPermissionRoutes);
 app.use('/api/role-permissions', rolePermissionRoutes);
 app.use('/api/permissions', permissionRoutes);
 app.use('/api/upload', uploadRoutes); // Add upload routes
+
+// Enhanced Multi-Tenant Management API Routes
+app.use('/api/tenant-dashboard', tenantDashboardRoutes);
+app.use('/api/super-admin', superAdminRoutes);
 
 
 // Mount notification routes

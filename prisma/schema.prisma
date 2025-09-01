@@ -8,980 +8,160 @@ datasource db {
 }
 
 model Tenant {
-  id                  String             @id @default(uuid())
-  name                String
-  createdAt           DateTime           @default(now())
-  updatedAt           DateTime           @updatedAt
-  domain              String             @unique
-  email               String
-  accreditationNumber String?
-  createdBy           String
-  currency            String?            @default("KES")
-  establishedYear     Int?
-  logoUrl             String?
-  phone               String?
-  status              InstitutionStatus  @default(ACTIVE)
-  timezone            String?            @default("Africa/Nairobi")
-  type                InstitutionType
-  address             String?
-  analyticsId         String?
-  billingCycle        BillingCycle       @default(MONTHLY)
-  city                String?
-  contactEmail        String?
-  contactPerson       String?
-  contactPhone        String?
-  country             String?            @default("Kenya")
-  county              String?
-  customizations      Json?
-  features            Json?
-  legalName           String?
-  marketingInfo       Json?
-  maxStorageGB        Int?               @default(5)
-  maxUsers            Int?               @default(10)
-  nextBillingDate     DateTime?
-  postalCode          String?
-  registrationNumber  String?
-  socialMedia         Json?
-  subscriptionPlan    String?            @default("BASIC")
-  subscriptionStatus  SubscriptionStatus @default(ACTIVE)
-  taxId               String?
-  trackingCode        String?
-  website             String?
-  auditLogs           AuditLog[]         @relation("TenantAuditLogs")
-  auditPrograms       AuditProgram[]
-  campuses            Campus[]
-  departments         Department[]
-  documents           Document[]
-  feedbacks           Feedback[]
-  messages            Message[]
-  notifications       Notification[]
-  roles               Role[]
-  branding            TenantBranding?
-  users               User[]
-  agendaTemplates     AgendaTemplate[]
+  id                 String             @id @default(uuid())
+  name               String
+  domain             String             @unique
+  email              String
+  phone              String?
+  type               SchoolType
+  logoUrl            String?
+  address            String?
+  city               String?
+  county             String?
+  country            String?            @default("Kenya")
+  postalCode         String?
+  registrationNumber String?
+  legalName          String?
+  contactPerson      String?
+  contactEmail       String?
+  contactPhone       String?
+  subscriptionPlan   SubscriptionPlan   @default(BASIC)
+  subscriptionStatus SubscriptionStatus @default(ACTIVE)
+  maxUsers           Int?               @default(100)
+  maxStudents        Int?               @default(500)
+  status             TenantStatus       @default(ACTIVE)
+  timezone           String?            @default("Africa/Nairobi")
+  currency           String?            @default("KES")
+  createdBy          String
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  academicYears      AcademicYear[]
+  assessments        Assessment[]
+  attendanceRecords  AttendanceRecord[]
+  buses              Bus[]
+  campuses           Campus[]
+  classLevels        ClassLevel[]
+  classRooms         ClassRoom[]
+  classStreams       ClassStream[]
+  examResults        ExamResult[]
+  feeItems           FeeItem[]
+  feeStructures      FeeStructure[]
+  invoices           Invoice[]
+  lessonAllocations  LessonAllocation[]
+  notifications      Notification[]
+  parents            Parent[]
+  payments           Payment[]
+  permissions        Permission[]
+  receipts           Receipt[]
+  reportCards        ReportCard[]
+  roles              Role[]
+  students           Student[]
+  subjects           Subject[]
+  systemLogs         SystemLog[]
+  teachers           Teacher[]
+  branding           TenantBranding?
+  terms              Term[]
+  timetables         TimetableSlot[]
+  transportBookings  TransportBooking[]
+  transportRoutes    TransportRoute[]
+  users              User[]
 
   @@index([domain])
-  @@index([email])
   @@index([status])
-  @@index([subscriptionStatus])
   @@index([type])
 }
 
 model TenantBranding {
-  id                String   @id @default(uuid())
-  tenantId          String   @unique
-  logoUrl           String?
-  logoDarkUrl       String?
-  faviconUrl        String?
-  logoAltText       String?
-  primaryColor      String?  @default("#00A79D")
-  secondaryColor    String?  @default("#EF8201")
-  accentColor       String?
-  backgroundColor   String?
-  textColor         String?
-  fontFamily        String?  @default("Satoshi")
-  headingFontFamily String?
-  tagline           String?
-  description       String?
-  missionStatement  String?
-  visionStatement   String?
-  valueProposition  String?
-  heroTitle         String?
-  heroSubtitle      String?
-  heroImageUrl      String?
-  heroVideoUrl      String?
-  primaryCtaText    String?  @default("Get Started")
-  secondaryCtaText  String?  @default("Learn More")
-  footerText        String?
-  footerLinks       Json?
-  metaTitle         String?
-  metaDescription   String?
-  metaKeywords      String?
-  ogImageUrl        String?
-  customCss         String?
-  customJs          String?
-  isActive          Boolean  @default(true)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  tenant            Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  id              String   @id @default(uuid())
+  tenantId        String   @unique
+  primaryColor    String   @default("#2563eb")
+  secondaryColor  String   @default("#059669")
+  logoUrl         String?
+  faviconUrl      String?
+  tagline         String?
+  description     String?
+  metaTitle       String?
+  metaDescription String?
+  metaKeywords    String?
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  tenant          Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 }
 
 model Campus {
-  id          String       @id @default(uuid())
-  name        String
-  address     String?
-  city        String?
-  county      String?
-  country     String?      @default("Kenya")
-  phone       String?
-  email       String?
-  isMain      Boolean      @default(false)
-  tenantId    String
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  tenant      Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  departments Department[]
-  users       User[]
-}
+  id         String      @id @default(uuid())
+  tenantId   String
+  name       String
+  address    String?
+  city       String?
+  county     String?
+  phone      String?
+  email      String?
+  isMain     Boolean     @default(false)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  tenant     Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  classRooms ClassRoom[]
+  users      User[]
 
-model Department {
-  id                  String               @id @default(uuid())
-  name                String
-  code                String?
-  tenantId            String
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt
-  campusId            String?
-  hodId               String?
-  campus              Campus?              @relation(fields: [campusId], references: [id])
-  hod                 User?                @relation("DepartmentHOD", fields: [hodId], references: [id])
-  tenant              Tenant               @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  feedbacks           Feedback[]
-  userDepartmentRoles UserDepartmentRole[]
+  @@unique([tenantId, name])
+  @@index([tenantId])
 }
 
 model User {
-  id                              String                    @id @default(uuid())
-  email                           String                    @unique
-  password                        String
-  tenantId                        String?
-  firstName                       String
-  lastName                        String
-  campusId                        String?
-  createdAt                       DateTime                  @default(now())
-  createdBy                       String
-  updatedAt                       DateTime                  @updatedAt
-  verified                        Boolean                   @default(false)
-  auditAnalyses                   AuditAnalysis[]
-  createdFindings                 AuditFinding[]            @relation("CreatedFindings")
-  auditLogs                       AuditLog[]                @relation("UserAuditLogs")
-  createdAuditPlans               AuditPlan[]               @relation("CreatedAuditPlans")
-  planningAttendances             PlanningMeetingAttendance[]
-  createdPlanningMeetings         PlanningMeeting[]         @relation("CreatedPlanningMeetings")
-  openingMeetingAttendances       OpeningMeetingAttendance[]
-  createdOpeningMeetings          OpeningMeeting[]          @relation("CreatedOpeningMeetings")
-  closingMeetingAttendances       ClosingMeetingAttendance[]
-  createdClosingMeetings          ClosingMeeting[]          @relation("CreatedClosingMeetings")
-  createdManagementReviewMeetings ManagementReviewMeeting[] @relation("CreatedManagementReviewMeetings")
-  managementReviewAttendances     ManagementReviewAttendance[]
-  approvedAuditPrograms           AuditProgram[]            @relation("AuditProgramApprovedBy")
-  createdAuditPrograms            AuditProgram[]            @relation("AuditProgramCreatedBy")
-  auditTeamMembers                AuditTeamMember[]         @relation("AuditTeamMemberUser")
-  createdChecklists               Checklist[]               @relation("CreatedChecklists")
-  checklistAssignees              ChecklistAssignee[]
-  completedChecklistItems         ChecklistItem[]           @relation("CompletedChecklistItems")
-  complianceRecordsCreated        ComplianceRecord[]        @relation("ComplianceRecordCreatedBy")
-  assignedCorrectiveActions       CorrectiveAction[]        @relation("AssignedCorrectiveActions")
-  createdCorrectiveActions        CorrectiveAction[]        @relation("CreatedCorrectiveActions")
-  headedDepartments               Department[]              @relation("DepartmentHOD")
-  ownedDocuments                  Document[]                @relation("UserOwnedDocuments")
-  documents                       Document[]
-  approvedDocumentApprovals       DocumentApproval[]        @relation("UserApprovedDocumentApprovals")
-  requestedChangeRequests         DocumentChangeRequest[]   @relation("UserRequestedChangeRequests")
-  createdDocumentVersions         DocumentVersion[]         @relation("UserCreatedDocumentVersions")
-  feedbacks                       Feedback[]
-  improvementOpportunitiesCreated ImprovementOpportunity[]  @relation("ImprovementCreatedBy")
-  improvementOpportunitiesOwned   ImprovementOpportunity[]  @relation("ImprovementOwner")
-  loginAttempts                   LoginAttempt[]            @relation("UserLoginAttempts")
-  receivedMessages                Message[]                 @relation("ReceivedMessages")
-  sentMessages                    Message[]                 @relation("SentMessages")
-  createdNonConformities          NonConformity[]           @relation("CreatedNonConformities")
-  notifications                   Notification[]
-  otps                            OTP[]                     @relation("UserOTPs")
-  passwordHistory                 PasswordHistory[]         @relation("UserPasswordHistory")
-  refreshTokens                   RefreshToken[]
-  sessions                        Session[]                 @relation("UserSessions")
-  campus                          Campus?                   @relation(fields: [campusId], references: [id])
-  tenant                          Tenant?                   @relation(fields: [tenantId], references: [id])
-  userDepartmentRoles             UserDepartmentRole[]
-  userRoles                       UserRole[]
-  generalNotificationSent         Audit[]                   @relation("GeneralNotificationSender")
-  managementReviewInvitationsSent Audit[]                   @relation("ManagementReviewInvitationSender")
-  userPermissions                 UserPermission[]
-  grantedPermissions              UserPermission[]          @relation("PermissionGrantedBy")
+  id              String            @id @default(uuid())
+  email           String            @unique
+  password        String?
+  firstName       String
+  lastName        String
+  phone           String?
+  avatar          String?
+  tenantId        String?
+  campusId        String?
+  verified        Boolean           @default(false)
+  active          Boolean           @default(true)
+  createdBy       String
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  lastLoginAt     DateTime?
+  loginAttempts   LoginAttempt[]
+  notifications   Notification[]
+  otps            OTP[]
+  parentProfile   Parent?
+  passwordHistory PasswordHistory[]
+  refreshTokens   RefreshToken[]
+  sessions        Session[]
+  systemLogs      SystemLog[]
+  teacherProfile  Teacher?
+  campus          Campus?           @relation(fields: [campusId], references: [id])
+  tenant          Tenant?           @relation(fields: [tenantId], references: [id])
+  userPermissions UserPermission[]
+  userRoles       UserRole[]
 
   @@index([tenantId])
-  @@index([campusId])
   @@index([email])
+  @@index([active])
 }
 
 model Role {
-  id                  String               @id @default(uuid())
-  name                String
-  description         String?
-  tenantId            String?
-  roleScope           String               @default("tenant") // tenant, department, hybrid
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt
-  defaultContext      String               @default("dashboard")
-  isDefault           Boolean              @default(false)
-  isRemovable         Boolean              @default(true)
-  loginDestination    String               @default("/dashboard")
-  documentApprovals   DocumentApproval[]   @relation("RoleDocumentApprovals")
-  tenant              Tenant?              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  rolePermissions     RolePermission[]
-  userDepartmentRoles UserDepartmentRole[]
-  userRoles           UserRole[]
+  id               String           @id @default(uuid())
+  name             String
+  displayName      String
+  description      String?
+  tenantId         String?
+  isSystemRole     Boolean          @default(false)
+  isDefault        Boolean          @default(false)
+  loginDestination String?          @default("/dashboard")
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  tenant           Tenant?          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  permissions      RolePermission[]
+  userRoles        UserRole[]
 
   @@unique([tenantId, name])
-}
-
-model UserRole {
-  userId    String
-  roleId    String
-  createdAt DateTime @default(now())
-  id        String   @id @default(uuid())
-  updatedAt DateTime @updatedAt
-  isDefault Boolean  @default(false)
-  role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, roleId])
-  @@index([userId])
-  @@index([roleId])
-}
-
-model UserDepartmentRole {
-  id                  String      @id @default(uuid())
-  userId              String
-  departmentId        String?
-  roleId              String
-  isPrimaryDepartment Boolean     @default(false)
-  isPrimaryRole       Boolean     @default(false)
-  createdAt           DateTime    @default(now())
-  updatedAt           DateTime    @updatedAt
-  isDefault           Boolean     @default(false)
-  department          Department? @relation(fields: [departmentId], references: [id], onDelete: Cascade)
-  role                Role        @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  user                User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, departmentId, roleId])
-  @@index([userId])
-  @@index([departmentId])
-  @@index([roleId])
-}
-
-model Notification {
-  id           String   @id @default(uuid())
-  type         String
-  title        String
-  message      String
-  tenantId     String?
-  targetUserId String
-  link         String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  metadata     Json?
-  isRead       Boolean  @default(false)
-  targetUser   User     @relation(fields: [targetUserId], references: [id], onDelete: Cascade)
-  tenant       Tenant?  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-
   @@index([tenantId])
-  @@index([targetUserId])
-}
-
-model Message {
-  id          String              @id @default(uuid())
-  senderId    String
-  tenantId    String
-  subject     String?
-  body        String
-  metadata    Json?
-  isRead      Boolean             @default(false)
-  createdAt   DateTime            @default(now())
-  updatedAt   DateTime            @updatedAt
-  recipientId String?
-  recipient   User?               @relation("ReceivedMessages", fields: [recipientId], references: [id], onDelete: Cascade)
-  sender      User                @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
-  tenant      Tenant              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  attachments MessageAttachment[]
-}
-
-model Feedback {
-  id           String         @id @default(uuid())
-  tenantId     String
-  origin       FeedbackOrigin
-  category     String
-  subject      String
-  source       FeedbackSource
-  sourceDetail String?
-  departmentId String?
-  rating       Int?
-  message      String
-  createdById  String?
-  createdAt    DateTime       @default(now())
-  createdBy    User?          @relation(fields: [createdById], references: [id])
-  department   Department?    @relation(fields: [departmentId], references: [id])
-  tenant       Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-}
-
-model MessageAttachment {
-  id         String   @id @default(uuid())
-  messageId  String
-  fileName   String
-  fileUrl    String
-  s3Key      String
-  uploadedAt DateTime @default(now())
-  message    Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
-}
-
-model RefreshToken {
-  id        String   @id @default(uuid())
-  token     String   @unique
-  userId    String
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model OTP {
-  id        String   @id @default(uuid())
-  email     String
-  code      String
-  expiresAt DateTime
-  verified  Boolean  @default(false)
-  createdAt DateTime @default(now())
-  userId    String?
-  user      User?    @relation("UserOTPs", fields: [userId], references: [id])
-
-  @@unique([email, createdAt])
-}
-
-model Session {
-  id           String   @id @default(uuid())
-  userId       String
-  token        String   @unique
-  deviceInfo   Json?
-  ipAddress    String?
-  userAgent    String?
-  expiresAt    DateTime
-  isActive     Boolean  @default(true)
-  lastActivity DateTime @default(now())
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  user         User     @relation("UserSessions", fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([token])
-  @@index([expiresAt])
-}
-
-model LoginAttempt {
-  id               String    @id @default(uuid())
-  email            String
-  ipAddress        String
-  userAgent        String?
-  success          Boolean
-  attemptTime      DateTime  @default(now())
-  lockoutExpiresAt DateTime?
-  userId           String?
-  user             User?     @relation("UserLoginAttempts", fields: [userId], references: [id])
-
-  @@index([email])
-  @@index([ipAddress])
-  @@index([attemptTime])
-}
-
-model PasswordHistory {
-  id           String   @id @default(uuid())
-  userId       String
-  passwordHash String
-  changedAt    DateTime @default(now())
-  user         User     @relation("UserPasswordHistory", fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([changedAt])
-}
-
-model Document {
-  id                          String                  @id @default(uuid())
-  title                       String
-  description                 String?
-  type                        DocumentType            @default(OTHER)
-  status                      DocumentStatus          @default(DRAFT)
-  tenantId                    String
-  auditPlan                   AuditPlan?
-  ownerId                     String
-  currentVersionId            String?
-  createdAt                   DateTime                @default(now())
-  updatedAt                   DateTime                @updatedAt
-  auditId                     String?
-  userId                      String?
-  lastUpdatedViaChangeRequest DateTime?
-  isRecentlyUpdated           Boolean                 @default(false)
-  audit                       Audit?                  @relation(fields: [auditId], references: [id])
-  currentVersion              DocumentVersion?        @relation("CurrentVersion", fields: [currentVersionId], references: [id])
-  owner                       User                    @relation("UserOwnedDocuments", fields: [ownerId], references: [id], onDelete: Cascade)
-  tenant                      Tenant                  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  User                        User?                   @relation(fields: [userId], references: [id])
-  approvals                   DocumentApproval[]
-  changeRequests              DocumentChangeRequest[]
-  versions                    DocumentVersion[]       @relation("DocumentVersions")
-
-  @@unique([tenantId, title])
-  @@index([tenantId])
-  @@index([ownerId])
-  @@index([status])
-  @@index([auditId])
-}
-
-model DocumentVersion {
-  id              String                 @id @default(uuid())
-  documentId      String
-  version         Int
-  fileUrl         String
-  createdById     String
-  createdAt       DateTime               @default(now())
-  changeRequestId String?
-  s3Key           String?
-  cloudinaryId     String?
-  status          DocumentVersionStatus  @default(ACTIVE)
-  asCurrentFor    Document[]             @relation("CurrentVersion")
-  changeRequest   DocumentChangeRequest? @relation(fields: [changeRequestId], references: [id])
-  createdBy       User                   @relation("UserCreatedDocumentVersions", fields: [createdById], references: [id], onDelete: Cascade)
-  document        Document               @relation("DocumentVersions", fields: [documentId], references: [id], onDelete: Cascade)
-
-  @@unique([documentId, version])
-  @@index([documentId])
-  @@index([createdById])
-}
-
-model DocumentChangeRequest {
-  id             String                      @id @default(uuid())
-  documentId     String
-  requestedById  String
-  description    String?
-  newFileUrl     String?
-  newVersion     Int?
-  createdAt      DateTime                    @default(now())
-  updatedAt      DateTime                    @updatedAt
-  clauseNumber   String?
-  currentClause  String?
-  justification  String?
-  proposedChange String?
-  status         DocumentChangeRequestStatus @default(UNDER_REVIEW)
-  approvals      DocumentApproval[]
-  document       Document                    @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  requestedBy    User                        @relation("UserRequestedChangeRequests", fields: [requestedById], references: [id], onDelete: Cascade)
-  versions       DocumentVersion[]
-
-  @@index([documentId])
-  @@index([requestedById])
-}
-
-model DocumentApproval {
-  id              String                 @id @default(uuid())
-  documentId      String
-  changeRequestId String?
-  approvedById    String
-  roleId          String?
-  status          DocumentStatus         @default(UNDER_REVIEW)
-  comment         String?
-  createdAt       DateTime               @default(now())
-  updatedAt       DateTime               @updatedAt
-  approvedBy      User                   @relation("UserApprovedDocumentApprovals", fields: [approvedById], references: [id], onDelete: Cascade)
-  changeRequest   DocumentChangeRequest? @relation(fields: [changeRequestId], references: [id])
-  document        Document               @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  role            Role?                  @relation("RoleDocumentApprovals", fields: [roleId], references: [id])
-
-  @@index([documentId])
-  @@index([approvedById])
-  @@index([roleId])
-}
-
-model AuditProgram {
-  id              String             @id @default(uuid())
-  title           String
-  objectives      String
-  status          AuditProgramStatus @default(DRAFT)
-  tenantId        String
-  createdById     String
-  committedAt     DateTime?
-  approvedById    String?
-  approvedAt      DateTime?
-  approvalComment String?
-  createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
-  audits          Audit[]
-  approvedBy      User?              @relation("AuditProgramApprovedBy", fields: [approvedById], references: [id])
-  createdBy       User               @relation("AuditProgramCreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
-  tenant          Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-
-  @@index([tenantId])
-  @@index([createdById])
-}
-
-model Audit {
-  id                        String                 @id @default(uuid())
-  auditProgramId            String
-  auditNo                   Int
-  type                      AuditType
-  auditDateFrom             DateTime?
-  auditDateTo               DateTime?
-  teamLeaderAppointmentDate DateTime?
-  teamMemberAppointmentDate DateTime?
-  followUpDateFrom          DateTime?
-  followUpDateTo            DateTime?
-  managementReviewDateFrom  DateTime?
-  managementReviewDateTo    DateTime?
-  status                    AuditStatus            @default(OPEN)
-  createdAt                 DateTime               @default(now())
-  updatedAt                 DateTime               @updatedAt
-  criteria                  String[]
-  methods                   String[]
-  objectives                String[]
-  scope                     String[]
-  notes                     String?
-  requirements              String?
-  timetable                 Json?
-  // Notification tracking fields
-  generalNotificationSentAt DateTime?
-  generalNotificationSentBy String?
-  // Management Review invitation tracking
-  managementReviewInvitationSentAt DateTime?
-  managementReviewInvitationSentBy String?
-  auditProgram              AuditProgram           @relation(fields: [auditProgramId], references: [id], onDelete: Cascade)
-  auditAnalyses             AuditAnalysis[]
-  findings                  AuditFinding[]
-  auditPlans                AuditPlan?
-  planningMeetings          PlanningMeeting[]
-  openingMeetings           OpeningMeeting[]
-  closingMeetings           ClosingMeeting[]
-  managementReviewMeetings  ManagementReviewMeeting[]
-  teamMembers               AuditTeamMember[]
-  checklists                Checklist[]
-  documents                 Document[]
-  // Relation to track who sent the notification
-  generalNotificationSender User?                  @relation("GeneralNotificationSender", fields: [generalNotificationSentBy], references: [id])
-  // Relation to track who sent the management review invitation
-  managementReviewInvitationSender User?           @relation("ManagementReviewInvitationSender", fields: [managementReviewInvitationSentBy], references: [id])
-
-  @@unique([auditProgramId, auditNo])
-  @@index([auditProgramId])
-  @@index([status])
-  @@index([generalNotificationSentAt])
-}
-
-model AuditTeamMember {
-  id            String           @id @default(uuid())
-  auditId       String
-  userId        String
-  appointedAt   DateTime?
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
-  role          String
-  declineReason String?
-  responseAt    DateTime?
-  status        TeamMemberStatus @default(PENDING)
-  audit         Audit            @relation(fields: [auditId], references: [id], onDelete: Cascade)
-  user          User             @relation("AuditTeamMemberUser", fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([auditId, userId])
-  @@index([auditId])
-  @@index([userId])
-}
-
-model AuditLog {
-  id         String   @id @default(uuid())
-  action     String
-  entityType String
-  entityId   String
-  userId     String
-  tenantId   String?
-  details    String?
-  metadata   Json?
-  ipAddress  String?
-  userAgent  String?
-  createdAt  DateTime @default(now())
-  tenant     Tenant?  @relation("TenantAuditLogs", fields: [tenantId], references: [id], onDelete: Cascade)
-  user       User     @relation("UserAuditLogs", fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([entityType])
-  @@index([entityId])
-  @@index([userId])
-  @@index([tenantId])
-  @@index([action])
-  @@index([createdAt])
-}
-
-// Planning Meeting Models - Independent Domain
-model PlanningMeeting {
-  id          String                    @id @default(uuid())
-  auditId     String
-  scheduledAt DateTime                  @default(now())
-  createdById String
-  notes       String?
-  createdAt   DateTime                  @default(now())
-  updatedAt   DateTime                  @updatedAt
-  status      PlanningMeetingStatus     @default(UPCOMING)
-  archived    Boolean                   @default(false)
-  venue       String?
-  agendas     PlanningMeetingAgenda[]
-  attendances PlanningMeetingAttendance[]
-  audit       Audit                     @relation(fields: [auditId], references: [id], onDelete: Cascade)
-  createdBy   User                      @relation("CreatedPlanningMeetings", fields: [createdById], references: [id], onDelete: Cascade)
-}
-
-model PlanningMeetingAttendance {
-  id        String               @id @default(uuid())
-  meetingId String
-  userId    String
-  present   Boolean              @default(false)
-  remarks   String?
-  createdAt DateTime             @default(now())
-  updatedAt DateTime             @updatedAt
-  meeting   PlanningMeeting      @relation(fields: [meetingId], references: [id], onDelete: Cascade)
-  user      User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([meetingId, userId])
-}
-
-model PlanningMeetingAgenda {
-  id         String               @id @default(uuid())
-  meetingId  String
-  agendaText String
-  order      Int
-  createdAt  DateTime             @default(now())
-  updatedAt  DateTime             @updatedAt
-  discussed  Boolean              @default(false)
-  notes      String?
-  meeting    PlanningMeeting      @relation(fields: [meetingId], references: [id], onDelete: Cascade)
-}
-
-// New Meeting Models - Type Specific
-model OpeningMeeting {
-  id          String                    @id @default(uuid())
-  auditId     String
-  scheduledAt DateTime                  @default(now())
-  createdById String
-  notes       String?
-  createdAt   DateTime                  @default(now())
-  updatedAt   DateTime                  @updatedAt
-  status      MeetingStatus             @default(UPCOMING)
-  archived    Boolean                   @default(false)
-  venue       String?
-  agendas     OpeningMeetingAgenda[]
-  attendances OpeningMeetingAttendance[]
-  audit       Audit                     @relation(fields: [auditId], references: [id], onDelete: Cascade)
-  createdBy   User                      @relation("CreatedOpeningMeetings", fields: [createdById], references: [id], onDelete: Cascade)
-}
-
-model OpeningMeetingAttendance {
-  id        String           @id @default(uuid())
-  meetingId String
-  userId    String
-  present   Boolean
-  remarks   String?
-  createdAt DateTime         @default(now())
-  updatedAt DateTime         @updatedAt
-  meeting   OpeningMeeting   @relation(fields: [meetingId], references: [id], onDelete: Cascade)
-  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([meetingId, userId])
-}
-
-model OpeningMeetingAgenda {
-  id         String           @id @default(uuid())
-  meetingId  String
-  agendaText String
-  order      Int
-  createdAt  DateTime         @default(now())
-  updatedAt  DateTime         @updatedAt
-  discussed  Boolean          @default(false)
-  notes      String?
-  meeting    OpeningMeeting   @relation(fields: [meetingId], references: [id], onDelete: Cascade)
-}
-
-model ClosingMeeting {
-  id          String                    @id @default(uuid())
-  auditId     String
-  scheduledAt DateTime                  @default(now())
-  createdById String
-  notes       String?
-  createdAt   DateTime                  @default(now())
-  updatedAt   DateTime                  @updatedAt
-  status      MeetingStatus             @default(UPCOMING)
-  archived    Boolean                   @default(false)
-  venue       String?
-  agendas     ClosingMeetingAgenda[]
-  attendances ClosingMeetingAttendance[]
-  audit       Audit                     @relation(fields: [auditId], references: [id], onDelete: Cascade)
-  createdBy   User                      @relation("CreatedClosingMeetings", fields: [createdById], references: [id], onDelete: Cascade)
-}
-
-model ClosingMeetingAttendance {
-  id        String           @id @default(uuid())
-  meetingId String
-  userId    String
-  present   Boolean
-  remarks   String?
-  createdAt DateTime         @default(now())
-  updatedAt DateTime         @updatedAt
-  meeting   ClosingMeeting   @relation(fields: [meetingId], references: [id], onDelete: Cascade)
-  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([meetingId, userId])
-}
-
-model ClosingMeetingAgenda {
-  id         String           @id @default(uuid())
-  meetingId  String
-  agendaText String
-  order      Int
-  createdAt  DateTime         @default(now())
-  updatedAt  DateTime         @updatedAt
-  discussed  Boolean          @default(false)
-  notes      String?
-  meeting    ClosingMeeting   @relation(fields: [meetingId], references: [id], onDelete: Cascade)
-}
-
-// Management Review Meeting Models
-model ManagementReviewMeeting {
-  id          String                           @id @default(uuid())
-  auditId     String
-  scheduledAt DateTime                         @default(now())
-  createdById String
-  notes       String?
-  createdAt   DateTime                         @default(now())
-  updatedAt   DateTime                         @updatedAt
-  status      ManagementReviewMeetingStatus   @default(UPCOMING)
-  archived    Boolean                          @default(false)
-  venue       String?
-  minutes     ManagementReviewMinute[]
-  attendances ManagementReviewAttendance[]
-  audit       Audit                            @relation(fields: [auditId], references: [id], onDelete: Cascade)
-  createdBy   User                             @relation("CreatedManagementReviewMeetings", fields: [createdById], references: [id], onDelete: Cascade)
-}
-
-model ManagementReviewAttendance {
-  id        String                    @id @default(uuid())
-  meetingId String
-  userId    String
-  present   Boolean                   @default(false)
-  remarks   String?
-  createdAt DateTime                  @default(now())
-  updatedAt DateTime                  @updatedAt
-  meeting   ManagementReviewMeeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
-  user      User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([meetingId, userId])
-}
-
-model ManagementReviewMinute {
-  id        String                    @id @default(uuid())
-  meetingId String
-  title     String                    // e.g., "MIN 1: PRELIMINARIES"
-  order     Int                       // e.g., 1, 2, 3...
-  notes     String?                   // Rich text notes for this minute
-  discussed Boolean                   @default(false)
-  createdAt DateTime                  @default(now())
-  updatedAt DateTime                  @updatedAt
-  meeting   ManagementReviewMeeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
-}
-
-model AuditPlan {
-  id               String          @id @default(uuid())
-  auditId          String          @unique
-  createdById      String
-  title            String
-  description      String?
-  objectives       String[]
-  documentId       String?         @unique
-  document         Document?       @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  scope            String[]
-  criteria         String[]
-  methods          String[]
-  plannedStartDate DateTime?
-  plannedEndDate   DateTime?
-  actualStartDate  DateTime?
-  actualEndDate    DateTime?
-  status           AuditPlanStatus @default(DRAFT)
-  createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
-  notes            String?
-  requirements     String?
-  timetable        Json?
-  audit            Audit           @relation(fields: [auditId], references: [id], onDelete: Cascade)
-  createdBy        User            @relation("CreatedAuditPlans", fields: [createdById], references: [id], onDelete: Cascade)
-}
-
-model AuditFinding {
-  id                       String                  @id @default(uuid())
-  createdById              String
-  title                    String
-  description              String
-  category                 FindingCategory?
-  department               String
-  attachments              String[]
-  createdAt                DateTime                @default(now())
-  updatedAt                DateTime                @updatedAt
-  auditId                  String
-  checklistId              String?                 // ← NEW: Direct link to checklist
-  criteria                 String
-  hodFeedback              String?
-  status                   FindingApprovalStatus   @default(PENDING)
-  reviewed                 Boolean                 @default(false)
-  reviewedAt               DateTime?
-  categorizationFinished   Boolean                 @default(false)
-  categorizationFinishedAt DateTime?
-  audit                    Audit                   @relation(fields: [auditId], references: [id], onDelete: Cascade)
-  checklist                Checklist?              @relation("ChecklistFindings", fields: [checklistId], references: [id], onDelete: SetNull) // ← NEW: Direct relationship
-  createdBy                User                    @relation("CreatedFindings", fields: [createdById], references: [id], onDelete: Cascade)
-  compliance               ComplianceRecord?       @relation("FindingCompliance")
-  improvements             ImprovementOpportunity? @relation("FindingImprovement")
-  nonConformities          NonConformity[]         @relation("FindingNonConformities")
-}
-
-model NonConformity {
-  id                String                @id @default(uuid())
-  findingId         String
-  createdById       String
-  title             String
-  description       String
-  clauseNumber      String?
-  type              NonConformityType
-  severity          NonConformitySeverity
-  rootCause         String?
-  status            NonConformityStatus   @default(OPEN)
-  createdAt         DateTime              @default(now())
-  updatedAt         DateTime              @updatedAt
-  correctiveActions CorrectiveAction[]
-  createdBy         User                  @relation("CreatedNonConformities", fields: [createdById], references: [id], onDelete: Cascade)
-  finding           AuditFinding          @relation("FindingNonConformities", fields: [findingId], references: [id], onDelete: Cascade)
-}
-
-model CorrectiveAction {
-  id                    String                   @id @default(uuid())
-  nonConformityId       String
-  assignedToId          String?
-  createdById           String
-  title                 String
-  description           String
-  actionType            CorrectiveActionType
-  priority              CorrectiveActionPriority
-  dueDate               DateTime?
-  completedDate         DateTime?
-  status                CorrectiveActionStatus   @default(OPEN)
-  progress              Int                      @default(0)
-  createdAt             DateTime                 @default(now())
-  updatedAt             DateTime                 @updatedAt
-  correctionRequirement Json?
-  proposedAction        Json?
-  appropriatenessReview Json?
-  followUpAction        Json?
-  actionEffectiveness   Json?
-  mrNotified            Boolean                  @default(false)
-  assignedTo            User?                    @relation("AssignedCorrectiveActions", fields: [assignedToId], references: [id])
-  createdBy             User                     @relation("CreatedCorrectiveActions", fields: [createdById], references: [id], onDelete: Cascade)
-  nonConformity         NonConformity            @relation(fields: [nonConformityId], references: [id], onDelete: Cascade)
-}
-
-model ComplianceRecord {
-  id          String           @id @default(uuid())
-  findingId   String           @unique
-  status      ComplianceStatus @default(COMPLIANT)
-  evidence    String?
-  notes       String?
-  createdById String
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-  createdBy   User             @relation("ComplianceRecordCreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
-  finding     AuditFinding     @relation("FindingCompliance", fields: [findingId], references: [id], onDelete: Cascade)
-}
-
-model ImprovementOpportunity {
-  id                     String            @id @default(uuid())
-  findingId              String            @unique
-  opportunity            String
-  actionPlan             String?
-  ownerId                String?
-  status                 ImprovementStatus @default(OPEN)
-  dueDate                DateTime?
-  completedAt            DateTime?
-  createdById            String
-  createdAt              DateTime          @default(now())
-  updatedAt              DateTime          @updatedAt
-  observationRequirement Json?
-  proposedAction         Json?
-  actionEffectiveness    Json?
-  appropriatenessReview  Json?
-  followUpAction         Json?
-  mrNotified             Boolean           @default(false)
-  createdBy              User              @relation("ImprovementCreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
-  finding                AuditFinding      @relation("FindingImprovement", fields: [findingId], references: [id], onDelete: Cascade)
-  owner                  User?             @relation("ImprovementOwner", fields: [ownerId], references: [id])
-}
-
-model Checklist {
-  id          String              @id @default(uuid())
-  createdById String
-  title       String
-  description String?
-  type        ChecklistType
-  department  String?
-  status      ChecklistStatus     @default(ACTIVE)
-  createdAt   DateTime            @default(now())
-  updatedAt   DateTime            @updatedAt
-  auditId     String
-  audit       Audit               @relation(fields: [auditId], references: [id], onDelete: Cascade)
-  createdBy   User                @relation("CreatedChecklists", fields: [createdById], references: [id], onDelete: Cascade)
-  assignees   ChecklistAssignee[]
-  items       ChecklistItem[]
-  findings    AuditFinding[]      @relation("ChecklistFindings") // ← NEW: Direct relationship to findings
-}
-
-model ChecklistItem {
-  id            String    @id @default(uuid())
-  checklistId   String
-  completedById String?
-  title         String
-  description   String?
-  clauseNumber  String?
-  isRequired    Boolean   @default(true)
-  order         Int
-  completed     Boolean   @default(false)
-  completedAt   DateTime?
-  notes         String?
-  evidence      String?
-  attachments   String[]
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  checklist     Checklist @relation(fields: [checklistId], references: [id], onDelete: Cascade)
-  completedBy   User?     @relation("CompletedChecklistItems", fields: [completedById], references: [id])
-
-  @@index([checklistId])
-  @@index([completed])
-}
-
-model ChecklistAssignee {
-  id          String    @id @default(uuid())
-  checklistId String
-  userId      String
-  assignedAt  DateTime  @default(now())
-  checklist   Checklist @relation(fields: [checklistId], references: [id], onDelete: Cascade)
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([checklistId, userId])
-  @@index([userId])
-}
-
-model AuditAnalysis {
-  id            String    @id @default(uuid())
-  auditId       String
-  department    String    @default("")
-  submittedById String
-  metrics       Json
-  remarks       String
-  finished      Boolean   @default(false)
-  finishedAt    DateTime?
-  mrNotified    Boolean   @default(false)
-  mrNotifiedAt  DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  audit         Audit     @relation(fields: [auditId], references: [id], onDelete: Cascade)
-  submittedBy   User      @relation(fields: [submittedById], references: [id], onDelete: Cascade)
-
-  @@unique([auditId, department])
+  @@index([isSystemRole])
 }
 
 model Permission {
@@ -989,12 +169,29 @@ model Permission {
   module          String
   action          String
   description     String?
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
+  tenantId        String?
+  tenant          Tenant?          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   rolePermissions RolePermission[]
   userPermissions UserPermission[]
 
-  @@unique([module, action], name: "module_action")
+  @@unique([module, action, tenantId])
+  @@index([module])
+  @@index([tenantId])
+}
+
+model UserRole {
+  id         String   @id @default(uuid())
+  userId     String
+  roleId     String
+  isDefault  Boolean  @default(false)
+  assignedAt DateTime @default(now())
+  assignedBy String?
+  role       Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId])
+  @@index([userId])
+  @@index([roleId])
 }
 
 model RolePermission {
@@ -1002,285 +199,960 @@ model RolePermission {
   roleId       String
   permissionId String
   allowed      Boolean    @default(true)
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
   permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
   role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
   @@unique([roleId, permissionId])
+  @@index([roleId])
+  @@index([permissionId])
 }
 
-// User-Specific Permissions - Allows direct permission assignment to users
 model UserPermission {
-  id            String     @id @default(uuid())
-  userId        String
-  permissionId  String
-  allowed       Boolean    @default(true)
-  grantedBy     String? // Who granted this permission
-  grantedAt     DateTime   @default(now())
-  expiresAt     DateTime? // Optional expiration
-  reason        String? // Why this permission was granted
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-  permission    Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
-  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  grantedByUser User?      @relation("PermissionGrantedBy", fields: [grantedBy], references: [id])
+  id           String     @id @default(uuid())
+  userId       String
+  permissionId String
+  allowed      Boolean    @default(true)
+  reason       String?
+  grantedBy    String?
+  grantedAt    DateTime   @default(now())
+  expiresAt    DateTime?
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, permissionId])
   @@index([userId])
   @@index([permissionId])
-  @@index([expiresAt])
 }
 
-model AgendaTemplate {
-  id          String                    @id @default(uuid())
-  name        String                    // e.g., "Opening Meeting Agendas", "Closing Meeting Agendas"
-  type        MeetingType              // OPENING, CLOSING, etc.
+model AcademicYear {
+  id          String       @id @default(uuid())
   tenantId    String
-  isActive    Boolean                   @default(true)
-  createdAt   DateTime                  @default(now())
-  updatedAt   DateTime                  @updatedAt
-  items       AgendaTemplateItem[]
-  tenant      Tenant                    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  name        String
+  startDate   DateTime
+  endDate     DateTime
+  isActive    Boolean      @default(false)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  tenant      Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  assessments Assessment[]
+  classRooms  ClassRoom[]
+  terms       Term[]
+
+  @@unique([tenantId, name])
+  @@index([tenantId])
+  @@index([isActive])
 }
 
-model AgendaTemplateItem {
-  id              String           @id @default(uuid())
-  templateId      String
-  agendaText      String
-  order           Int
-  isRequired      Boolean          @default(true)
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-  template        AgendaTemplate    @relation(fields: [templateId], references: [id], onDelete: Cascade)
+model Term {
+  id             String       @id @default(uuid())
+  tenantId       String
+  academicYearId String
+  name           String
+  startDate      DateTime
+  endDate        DateTime
+  isActive       Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  assessments    Assessment[]
+  ReportCard     ReportCard[]
+  academicYear   AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+  tenant         Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, academicYearId, name])
+  @@index([tenantId])
+  @@index([academicYearId])
+  @@index([isActive])
 }
 
-enum InstitutionType {
+model ClassLevel {
+  id            String         @id @default(uuid())
+  tenantId      String
+  name          String
+  level         Int
+  schoolType    SchoolType
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  tenant        Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  classRooms    ClassRoom[]
+  feeStructures FeeStructure[]
+
+  @@unique([tenantId, name])
+  @@index([tenantId])
+  @@index([level])
+}
+
+model ClassStream {
+  id         String      @id @default(uuid())
+  tenantId   String
+  name       String
+  code       String
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  classRooms ClassRoom[]
+  tenant     Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, name])
+  @@unique([tenantId, code])
+  @@index([tenantId])
+}
+
+model ClassRoom {
+  id                String             @id @default(uuid())
+  tenantId          String
+  campusId          String?
+  academicYearId    String
+  classLevelId      String
+  classStreamId     String?
+  name              String
+  code              String
+  capacity          Int?               @default(40)
+  classTeacherId    String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  assessments       Assessment[]
+  attendanceRecords AttendanceRecord[]
+  academicYear      AcademicYear       @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+  campus            Campus?            @relation(fields: [campusId], references: [id])
+  classLevel        ClassLevel         @relation(fields: [classLevelId], references: [id], onDelete: Cascade)
+  classStream       ClassStream?       @relation(fields: [classStreamId], references: [id])
+  classTeacher      Teacher?           @relation("ClassTeacherAssignments", fields: [classTeacherId], references: [id])
+  tenant            Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  lessonAllocations LessonAllocation[]
+  ReportCard        ReportCard[]
+  students          Student[]
+  timetableSlots    TimetableSlot[]
+
+  @@unique([tenantId, academicYearId, name])
+  @@index([tenantId])
+  @@index([academicYearId])
+  @@index([classLevelId])
+  @@index([classTeacherId])
+}
+
+model Subject {
+  id                String             @id @default(uuid())
+  tenantId          String
+  name              String
+  code              String
+  category          SubjectCategory
+  description       String?
+  minClassLevel     Int?
+  maxClassLevel     Int?
+  isCompulsory      Boolean            @default(false)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  assessments       Assessment[]
+  examResults       ExamResult[]
+  lessonAllocations LessonAllocation[]
+  tenant            Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, code])
+  @@index([tenantId])
+  @@index([category])
+}
+
+model Student {
+  id                String              @id @default(uuid())
+  tenantId          String
+  firstName         String
+  lastName          String
+  middleName        String?
+  dateOfBirth       DateTime?
+  gender            Gender
+  nationalId        String?
+  passportNumber    String?
+  phone             String?
+  email             String?
+  address           String?
+  studentNumber     String
+  classRoomId       String?
+  admissionDate     DateTime?
+  admissionNumber   String?
+  previousSchool    String?
+  emergencyContact  String?
+  emergencyPhone    String?
+  medicalConditions String?
+  allergies         String?
+  specialNeeds      String?
+  status            StudentStatus       @default(ACTIVE)
+  graduationDate    DateTime?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  attendanceRecords AttendanceRecord[]
+  examResults       ExamResult[]
+  invoices          Invoice[]
+  payments          Payment[]
+  receipts          Receipt[]
+  reportCards       ReportCard[]
+  classRoom         ClassRoom?          @relation(fields: [classRoomId], references: [id])
+  tenant            Tenant              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  StudentAttendance StudentAttendance[]
+  parentLinks       StudentParent[]
+  transportBookings TransportBooking[]
+
+  @@unique([tenantId, studentNumber])
+  @@index([tenantId])
+  @@index([classRoomId])
+  @@index([status])
+}
+
+model Parent {
+  id                 String          @id @default(uuid())
+  tenantId           String
+  userId             String?         @unique
+  firstName          String
+  lastName           String
+  middleName         String?
+  gender             Gender
+  nationalId         String?
+  phone              String
+  email              String?
+  address            String?
+  occupation         String?
+  employer           String?
+  workPhone          String?
+  isEmergencyContact Boolean         @default(false)
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  tenant             Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user               User?           @relation(fields: [userId], references: [id])
+  studentLinks       StudentParent[]
+
+  @@unique([tenantId, phone])
+  @@index([tenantId])
+  @@index([userId])
+}
+
+model StudentParent {
+  id           String             @id @default(uuid())
+  studentId    String
+  parentId     String
+  relationship ParentRelationship
+  isPrimary    Boolean            @default(false)
+  createdAt    DateTime           @default(now())
+  parent       Parent             @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  student      Student            @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, parentId])
+  @@index([studentId])
+  @@index([parentId])
+}
+
+model Teacher {
+  id                      String             @id @default(uuid())
+  tenantId                String
+  userId                  String             @unique
+  employeeNumber          String
+  tscNumber               String?
+  qualification           String?
+  specialization          String?
+  employmentDate          DateTime?
+  employmentType          EmploymentType     @default(PERMANENT)
+  contractEndDate         DateTime?
+  phone                   String?
+  address                 String?
+  emergencyContact        String?
+  emergencyPhone          String?
+  status                  TeacherStatus      @default(ACTIVE)
+  createdAt               DateTime           @default(now())
+  updatedAt               DateTime           @updatedAt
+  classTeacherAssignments ClassRoom[]        @relation("ClassTeacherAssignments")
+  lessonAllocations       LessonAllocation[]
+  tenant                  Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user                    User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, employeeNumber])
+  @@index([tenantId])
+  @@index([userId])
+  @@index([status])
+}
+
+model TimetableSlot {
+  id                String             @id @default(uuid())
+  tenantId          String
+  classRoomId       String?
+  dayOfWeek         DayOfWeek
+  periodNumber      Int
+  startTime         String
+  endTime           String
+  duration          Int
+  name              String?
+  isBreak           Boolean            @default(false)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  lessonAllocations LessonAllocation[]
+  classRoom         ClassRoom?         @relation(fields: [classRoomId], references: [id])
+  tenant            Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, classRoomId, dayOfWeek, periodNumber])
+  @@index([tenantId])
+  @@index([classRoomId])
+  @@index([dayOfWeek])
+}
+
+model LessonAllocation {
+  id              String        @id @default(uuid())
+  tenantId        String
+  classRoomId     String
+  subjectId       String
+  teacherId       String
+  timetableSlotId String
+  venue           String?
+  notes           String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  classRoom       ClassRoom     @relation(fields: [classRoomId], references: [id], onDelete: Cascade)
+  subject         Subject       @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  teacher         Teacher       @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  tenant          Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  timetableSlot   TimetableSlot @relation(fields: [timetableSlotId], references: [id], onDelete: Cascade)
+
+  @@unique([classRoomId, timetableSlotId])
+  @@index([tenantId])
+  @@index([classRoomId])
+  @@index([subjectId])
+  @@index([teacherId])
+}
+
+model AttendanceRecord {
+  id                 String              @id @default(uuid())
+  tenantId           String
+  classRoomId        String
+  date               DateTime            @db.Date
+  takenBy            String
+  takenAt            DateTime            @default(now())
+  notes              String?
+  studentId          String?
+  classRoom          ClassRoom           @relation(fields: [classRoomId], references: [id], onDelete: Cascade)
+  Student            Student?            @relation(fields: [studentId], references: [id])
+  tenant             Tenant              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  studentAttendances StudentAttendance[]
+
+  @@unique([tenantId, classRoomId, date])
+  @@index([tenantId])
+  @@index([classRoomId])
+  @@index([date])
+}
+
+model StudentAttendance {
+  id                 String           @id @default(uuid())
+  attendanceRecordId String
+  studentId          String
+  status             AttendanceStatus
+  arrivalTime        DateTime?
+  departureTime      DateTime?
+  notes              String?
+  attendanceRecord   AttendanceRecord @relation(fields: [attendanceRecordId], references: [id], onDelete: Cascade)
+  student            Student          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([attendanceRecordId, studentId])
+  @@index([attendanceRecordId])
+  @@index([studentId])
+  @@index([status])
+}
+
+model Assessment {
+  id             String           @id @default(uuid())
+  tenantId       String
+  academicYearId String
+  termId         String
+  classRoomId    String
+  subjectId      String
+  name           String
+  type           AssessmentType
+  description    String?
+  scheduledDate  DateTime?
+  duration       Int?
+  venue          String?
+  totalMarks     Int
+  passingMarks   Int?
+  status         AssessmentStatus @default(SCHEDULED)
+  createdBy      String
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  academicYear   AcademicYear     @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+  classRoom      ClassRoom        @relation(fields: [classRoomId], references: [id], onDelete: Cascade)
+  subject        Subject          @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  tenant         Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  term           Term             @relation(fields: [termId], references: [id], onDelete: Cascade)
+  examResults    ExamResult[]
+
+  @@index([tenantId])
+  @@index([academicYearId])
+  @@index([termId])
+  @@index([classRoomId])
+  @@index([subjectId])
+  @@index([status])
+}
+
+model ExamResult {
+  id            String     @id @default(uuid())
+  assessmentId  String
+  studentId     String
+  subjectId     String
+  marksObtained Int
+  totalMarks    Int
+  percentage    Float
+  grade         String?
+  remarks       String?
+  enteredBy     String
+  enteredAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  tenantId      String?
+  assessment    Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  student       Student    @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  subject       Subject    @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  Tenant        Tenant?    @relation(fields: [tenantId], references: [id])
+
+  @@unique([assessmentId, studentId, subjectId])
+  @@index([assessmentId])
+  @@index([studentId])
+  @@index([subjectId])
+}
+
+model ReportCard {
+  id                  String           @id @default(uuid())
+  studentId           String
+  termId              String
+  classRoomId         String
+  totalMarks          Int
+  averageMarks        Float
+  position            Int?
+  outOf               Int?
+  overallGrade        String?
+  daysPresent         Int?
+  daysAbsent          Int?
+  totalDays           Int?
+  classTeacherComment String?
+  headTeacherComment  String?
+  status              ReportCardStatus @default(DRAFT)
+  publishedAt         DateTime?
+  generatedBy         String
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+  tenantId            String?
+  classRoom           ClassRoom        @relation(fields: [classRoomId], references: [id], onDelete: Cascade)
+  student             Student          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  Tenant              Tenant?          @relation(fields: [tenantId], references: [id])
+  term                Term             @relation(fields: [termId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, termId])
+  @@index([studentId])
+  @@index([termId])
+  @@index([classRoomId])
+  @@index([status])
+}
+
+model FeeItem {
+  id                String             @id @default(uuid())
+  tenantId          String
+  name              String
+  description       String?
+  category          FeeCategory
+  amount            Decimal            @db.Decimal(10, 2)
+  currency          String             @default("KES")
+  isCompulsory      Boolean            @default(true)
+  isRecurring       Boolean            @default(true)
+  isActive          Boolean            @default(true)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  tenant            Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  feeStructureItems FeeStructureItem[]
+
+  @@unique([tenantId, name])
+  @@index([tenantId])
+  @@index([category])
+  @@index([isActive])
+}
+
+model FeeStructure {
+  id            String             @id @default(uuid())
+  tenantId      String
+  classLevelId  String
+  name          String
+  description   String?
+  effectiveFrom DateTime
+  effectiveTo   DateTime?
+  isActive      Boolean            @default(true)
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  classLevel    ClassLevel         @relation(fields: [classLevelId], references: [id], onDelete: Cascade)
+  tenant        Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  feeItems      FeeStructureItem[]
+
+  @@unique([tenantId, classLevelId, effectiveFrom])
+  @@index([tenantId])
+  @@index([classLevelId])
+  @@index([isActive])
+}
+
+model FeeStructureItem {
+  id             String       @id @default(uuid())
+  feeStructureId String
+  feeItemId      String
+  amount         Decimal      @db.Decimal(10, 2)
+  feeItem        FeeItem      @relation(fields: [feeItemId], references: [id], onDelete: Cascade)
+  feeStructure   FeeStructure @relation(fields: [feeStructureId], references: [id], onDelete: Cascade)
+
+  @@unique([feeStructureId, feeItemId])
+  @@index([feeStructureId])
+  @@index([feeItemId])
+}
+
+model Invoice {
+  id            String        @id @default(uuid())
+  tenantId      String
+  studentId     String
+  invoiceNumber String        @unique
+  description   String?
+  totalAmount   Decimal       @db.Decimal(10, 2)
+  paidAmount    Decimal       @default(0) @db.Decimal(10, 2)
+  balanceAmount Decimal       @db.Decimal(10, 2)
+  currency      String        @default("KES")
+  issueDate     DateTime      @default(now())
+  dueDate       DateTime
+  status        InvoiceStatus @default(PENDING)
+  createdBy     String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  student       Student       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  tenant        Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  payments      Payment[]
+  receipts      Receipt[]
+
+  @@index([tenantId])
+  @@index([studentId])
+  @@index([status])
+  @@index([dueDate])
+}
+
+model Payment {
+  id            String        @id @default(uuid())
+  tenantId      String
+  studentId     String
+  invoiceId     String?
+  paymentNumber String        @unique
+  amount        Decimal       @db.Decimal(10, 2)
+  currency      String        @default("KES")
+  method        PaymentMethod
+  reference     String?
+  paymentDate   DateTime      @default(now())
+  status        PaymentStatus @default(PENDING)
+  notes         String?
+  recordedBy    String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  invoice       Invoice?      @relation(fields: [invoiceId], references: [id])
+  student       Student       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  tenant        Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  receipt       Receipt?
+
+  @@index([tenantId])
+  @@index([studentId])
+  @@index([invoiceId])
+  @@index([status])
+  @@index([paymentDate])
+}
+
+model Receipt {
+  id            String   @id @default(uuid())
+  tenantId      String
+  studentId     String
+  paymentId     String   @unique
+  receiptNumber String   @unique
+  amount        Decimal  @db.Decimal(10, 2)
+  currency      String   @default("KES")
+  description   String?
+  issueDate     DateTime @default(now())
+  issuedBy      String
+  createdAt     DateTime @default(now())
+  invoiceId     String?
+  Invoice       Invoice? @relation(fields: [invoiceId], references: [id])
+  payment       Payment  @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  student       Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([studentId])
+  @@index([receiptNumber])
+}
+
+model TransportRoute {
+  id          String             @id @default(uuid())
+  tenantId    String
+  name        String
+  description String?
+  startPoint  String
+  endPoint    String
+  distance    Float?
+  monthlyFee  Decimal?           @db.Decimal(10, 2)
+  isActive    Boolean            @default(true)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  buses       Bus[]
+  bookings    TransportBooking[]
+  tenant      Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  stops       TransportStop[]
+
+  @@unique([tenantId, name])
+  @@index([tenantId])
+  @@index([isActive])
+}
+
+model TransportStop {
+  id        String             @id @default(uuid())
+  routeId   String
+  name      String
+  latitude  Float?
+  longitude Float?
+  order     Int
+  bookings  TransportBooking[]
+  route     TransportRoute     @relation(fields: [routeId], references: [id], onDelete: Cascade)
+
+  @@unique([routeId, order])
+  @@index([routeId])
+}
+
+model Bus {
+  id                 String          @id @default(uuid())
+  tenantId           String
+  routeId            String?
+  registrationNumber String          @unique
+  capacity           Int
+  model              String?
+  year               Int?
+  driverName         String?
+  driverPhone        String?
+  driverLicense      String?
+  status             BusStatus       @default(ACTIVE)
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  route              TransportRoute? @relation(fields: [routeId], references: [id])
+  tenant             Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([routeId])
+  @@index([status])
+}
+
+model TransportBooking {
+  id         String         @id @default(uuid())
+  tenantId   String
+  studentId  String
+  routeId    String
+  stopId     String
+  startDate  DateTime
+  endDate    DateTime?
+  monthlyFee Decimal        @db.Decimal(10, 2)
+  status     BookingStatus  @default(ACTIVE)
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+  route      TransportRoute @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  stop       TransportStop  @relation(fields: [stopId], references: [id], onDelete: Cascade)
+  student    Student        @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  tenant     Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, routeId, startDate])
+  @@index([tenantId])
+  @@index([studentId])
+  @@index([routeId])
+  @@index([status])
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  tenantId  String
+  userId    String
+  title     String
+  message   String
+  type      NotificationType
+  category  String?
+  data      Json?
+  isRead    Boolean          @default(false)
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+  tenant    Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([userId])
+  @@index([isRead])
+  @@index([createdAt])
+}
+
+model SystemLog {
+  id        String   @id @default(uuid())
+  tenantId  String?
+  userId    String?
+  action    String
+  entity    String?
+  entityId  String?
+  oldValues Json?
+  newValues Json?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  tenant    Tenant?  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user      User?    @relation(fields: [userId], references: [id])
+
+  @@index([tenantId])
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+model Session {
+  id         String   @id @default(uuid())
+  userId     String
+  token      String   @unique
+  deviceInfo Json?
+  ipAddress  String?
+  userAgent  String?
+  isActive   Boolean  @default(true)
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@index([isActive])
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
+
+model OTP {
+  id        String   @id @default(uuid())
+  userId    String
+  code      String
+  type      OTPType
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([code])
+  @@index([type])
+}
+
+model PasswordHistory {
+  id           String   @id @default(uuid())
+  userId       String
+  passwordHash String
+  createdAt    DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model LoginAttempt {
+  id         String   @id @default(uuid())
+  userId     String?
+  email      String
+  ipAddress  String
+  userAgent  String?
+  successful Boolean
+  createdAt  DateTime @default(now())
+  user       User?    @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([email])
+  @@index([ipAddress])
+  @@index([createdAt])
+}
+
+enum SchoolType {
+  PRIMARY
+  SECONDARY
   UNIVERSITY
   COLLEGE
-  SCHOOL
-  INSTITUTE
-  OTHER
+  KINDERGARTEN
+  SPECIAL_NEEDS
 }
 
-enum InstitutionStatus {
+enum TenantStatus {
   ACTIVE
   INACTIVE
-  PENDING
-}
-
-enum DocumentStatus {
-  DRAFT
-  UNDER_REVIEW
-  APPROVED
-  REJECTED
-  OBSOLETE
-  PUBLISHED
-}
-
-enum DocumentType {
-  POLICY
-  PROCEDURE
-  FORM
-  RECORD
-  OTHER
-  AUDIT_REPORT
-  AUDIT_PLAN
-}
-
-enum AuditProgramStatus {
-  DRAFT
-  UNDER_REVIEW
-  APPROVED
-  REJECTED
-}
-
-enum AuditType {
-  FIRST_INTERNAL
-  FIRST_SURVEILLANCE
-  SECOND_INTERNAL
-  SECOND_SURVEILLANCE
-  THIRD_INTERNAL
-  RECERTIFICATION
-}
-
-enum AuditStatus {
-  OPEN
-  COMPLETED
-  CANCELLED
-}
-
-enum TeamMemberStatus {
-  PENDING
-  ACCEPTED
-  DECLINED
-}
-
-enum MeetingStatus {
-  UPCOMING
-  ACTIVE
-  COMPLETED
-}
-
-enum PlanningMeetingStatus {
-  UPCOMING
-  ACTIVE
-  COMPLETED
-}
-
-enum ManagementReviewMeetingStatus {
-  UPCOMING
-  ACTIVE
-  COMPLETED
-}
-
-enum MeetingType {
-  PLANNING
-  OPENING
-  CLOSING
-  MANAGEMENT_REVIEW
-}
-
-enum SubscriptionStatus {
-  ACTIVE
   SUSPENDED
-  CANCELLED
-  EXPIRED
-  TRIAL
-  PENDING
-}
-
-enum BillingCycle {
-  MONTHLY
-  QUARTERLY
-  YEARLY
-  CUSTOM
 }
 
 enum SubscriptionPlan {
   BASIC
-  PROFESSIONAL
+  PREMIUM
   ENTERPRISE
-  CUSTOM
 }
 
-enum FeedbackOrigin {
-  INTERNAL
-  EXTERNAL
+enum SubscriptionStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  EXPIRED
 }
 
-enum FeedbackSource {
-  ANONYMOUS
-  USER
+enum Gender {
+  MALE
+  FEMALE
   OTHER
 }
 
-enum ComplianceStatus {
-  COMPLIANT
-  NON_COMPLIANT
-  PARTIALLY_COMPLIANT
+enum StudentStatus {
+  ACTIVE
+  GRADUATED
+  TRANSFERRED
+  SUSPENDED
+  EXPELLED
+  DROPOUT
 }
 
-enum ImprovementStatus {
-  OPEN
+enum TeacherStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  RESIGNED
+  RETIRED
+}
+
+enum EmploymentType {
+  PERMANENT
+  CONTRACT
+  PART_TIME
+  VOLUNTEER
+}
+
+enum ParentRelationship {
+  FATHER
+  MOTHER
+  GUARDIAN
+  SIBLING
+  GRANDPARENT
+  UNCLE
+  AUNT
+  OTHER
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+  EXCUSED
+  HALF_DAY
+}
+
+enum AssessmentType {
+  QUIZ
+  TEST
+  EXAM
+  PROJECT
+  ASSIGNMENT
+  PRACTICAL
+  ORAL
+}
+
+enum AssessmentStatus {
+  SCHEDULED
   IN_PROGRESS
   COMPLETED
-  CLOSED
+  CANCELLED
 }
 
-enum AuditPlanStatus {
+enum ReportCardStatus {
   DRAFT
-  IN_PROGRESS
-  COMPLETED
-  CANCELLED
-  SUBMITTED
-  APPROVED
-  REJECTED
+  PUBLISHED
+  SENT
 }
 
-enum FindingApprovalStatus {
+enum SubjectCategory {
+  CORE
+  ELECTIVE
+  EXTRA_CURRICULAR
+  LANGUAGE
+  SCIENCE
+  ARTS
+  TECHNICAL
+  RELIGIOUS
+}
+
+enum FeeCategory {
+  TUITION
+  TRANSPORT
+  MEALS
+  BOOKS
+  UNIFORM
+  LABORATORY
+  LIBRARY
+  SPORTS
+  EXAM
+  OTHER
+}
+
+enum InvoiceStatus {
   PENDING
-  ACCEPTED
-  REFUSED
-  UNDER_REVIEW
-}
-
-enum FindingCategory {
-  COMPLIANCE
-  IMPROVEMENT
-  NON_CONFORMITY
-}
-
-enum NonConformityType {
-  MAJOR
-  MINOR
-  OBSERVATION
-}
-
-enum NonConformitySeverity {
-  LOW
-  MEDIUM
-  HIGH
-  CRITICAL
-}
-
-enum NonConformityStatus {
-  OPEN
-  IN_PROGRESS
-  RESOLVED
-  CLOSED
-}
-
-enum CorrectiveActionType {
-  CORRECTIVE
-  PREVENTIVE
-  IMPROVEMENT
-}
-
-enum CorrectiveActionPriority {
-  LOW
-  MEDIUM
-  HIGH
-  URGENT
-}
-
-enum CorrectiveActionStatus {
-  OPEN
-  IN_PROGRESS
-  COMPLETED
-  VERIFIED
-  CLOSED
-}
-
-enum ChecklistType {
-  PRE_AUDIT
-  DURING_AUDIT
-  POST_AUDIT
-  COMPLIANCE
-  DEPARTMENT_SPECIFIC
-  ISO_CLAUSE
-  GENERAL
-}
-
-enum ChecklistStatus {
-  ACTIVE
-  COMPLETED
-  ARCHIVED
+  PARTIALLY_PAID
+  PAID
+  OVERDUE
   CANCELLED
 }
 
-enum DocumentChangeRequestStatus {
-  UNDER_REVIEW
-  APPROVED
-  REJECTED
-  APPLIED
+enum PaymentMethod {
+  CASH
+  BANK_TRANSFER
+  MPESA
+  CHEQUE
+  CARD
+  OTHER
 }
 
-enum DocumentVersionStatus {
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  CANCELLED
+  REFUNDED
+}
+
+enum BusStatus {
   ACTIVE
-  ARCHIVED
-  OBSOLETE
+  MAINTENANCE
+  INACTIVE
+  RETIRED
 }
 
+enum BookingStatus {
+  ACTIVE
+  SUSPENDED
+  CANCELLED
+  EXPIRED
+}
 
+enum NotificationType {
+  INFO
+  WARNING
+  ERROR
+  SUCCESS
+}
 
+enum OTPType {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
+  TWO_FACTOR
+}

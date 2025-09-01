@@ -9,72 +9,35 @@ const { sendUserInvitationEmail } = require('../utils/emailUtils');
 const formatUserData = (user) => {
   if (!user) return null;
 
-  // Build roles array with department context
-  const departmentRoles = (user.userDepartmentRoles || []).map(udr => ({
-    id: udr.id,
-    department: udr.department ? { 
-      id: udr.department.id, 
-      name: udr.department.name,
-      code: udr.department.code 
-    } : null,
-    role: udr.role ? { 
-      id: udr.role.id, 
-      name: udr.role.name,
-      description: udr.role.description,
-      roleScope: udr.role.roleScope
-    } : null,
-    isPrimaryDepartment: udr.isPrimaryDepartment || false,
-    isPrimaryRole: udr.isPrimaryRole || false,
-    isDefault: udr.isDefault || false,
-  }));
-
-  // Build system roles array (tenant-wide roles)
-  const systemRoles = (user.userRoles || []).map(ur => ({
+  // Build roles array (simplified for new schema)
+  const userRoles = (user.userRoles || []).map(ur => ({
     id: ur.id,
     role: ur.role ? { 
       id: ur.role.id, 
       name: ur.role.name,
       description: ur.role.description,
-      roleScope: ur.role.roleScope,
       loginDestination: ur.role.loginDestination
     } : null,
     isDefault: ur.isDefault || false,
   }));
 
-  // Determine primary department and role
-  const primaryDepartmentRole = departmentRoles.find(dr => dr.isPrimaryDepartment) || departmentRoles[0];
-  const primarySystemRole = systemRoles.find(sr => sr.isDefault) || systemRoles[0];
+  // Determine primary role
+  const primaryRole = userRoles.find(ur => ur.isDefault) || userRoles[0];
 
   // Determine default role
   let defaultRole = null;
-  const defaultDepartmentRole = departmentRoles.find(dr => dr.isDefault);
-  const defaultSystemRole = systemRoles.find(sr => sr.isDefault);
+  const defaultUserRole = userRoles.find(ur => ur.isDefault);
 
-  if (defaultDepartmentRole) {
+  if (defaultUserRole) {
     defaultRole = {
-      id: defaultDepartmentRole.role.id,
-      name: defaultDepartmentRole.role.name,
-      type: 'department',
-      department: defaultDepartmentRole.department
-    };
-  } else if (defaultSystemRole) {
-    defaultRole = {
-      id: defaultSystemRole.role.id,
-      name: defaultSystemRole.role.name,
+      id: defaultUserRole.role.id,
+      name: defaultUserRole.role.name,
       type: 'system'
     };
   }
 
-  // Build departments array
-  const departments = departmentRoles
-    .filter(dr => dr.department)
-    .map(dr => dr.department);
-
-  // Build roles array (flattened for backward compatibility)
-  const roles = [
-    ...systemRoles.map(sr => ({ ...sr.role, type: 'system' })),
-    ...departmentRoles.map(dr => ({ ...dr.role, type: 'department', department: dr.department }))
-  ].filter(Boolean);
+  // Build roles array (simplified for new schema)
+  const roles = userRoles.map(ur => ({ ...ur.role, type: 'system' })).filter(Boolean);
 
   return {
     id: user.id,
@@ -99,24 +62,20 @@ const formatUserData = (user) => {
       name: user.campus.name
     } : null,
 
-    // Role and department assignments
-    userDepartmentRoles: departmentRoles,
-    userRoles: systemRoles,
+    // Role assignments
+    userRoles: userRoles,
     
     // Primary assignments
-    primaryDepartment: primaryDepartmentRole?.department || null,
-    primaryRole: primaryDepartmentRole?.role || primarySystemRole?.role || null,
+    primaryRole: primaryRole?.role || null,
     
     // Default role
     defaultRole,
     
     // Flattened arrays for backward compatibility
     roles,
-    departments,
     
     // Role names for easy access
     roleNames: roles.map(r => r.name),
-    departmentNames: departments.map(d => d.name),
     
     // Display helpers
     displayName: `${user.firstName} ${user.lastName}`,

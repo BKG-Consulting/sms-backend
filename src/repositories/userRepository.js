@@ -25,12 +25,6 @@ const userRepository = {
           include: {
             role: true
           }
-        },
-        userDepartmentRoles: {
-          include: {
-            role: true,
-            department: true
-          }
         }
       }
     });
@@ -44,12 +38,6 @@ const userRepository = {
         userRoles: {
           include: {
             role: true
-          }
-        },
-        userDepartmentRoles: {
-          include: {
-            role: true,
-            department: true
           }
         }
       },

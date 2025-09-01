@@ -1,2 +1,0 @@
--- AlterEnum
-ALTER TYPE "MeetingType" ADD VALUE 'MANAGEMENT_REVIEW';
