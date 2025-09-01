@@ -1,0 +1,18 @@
+# Add these to your .env file:
+
+# Storage Configuration
+STORAGE_TYPE=cloudinary
+
+# Cloudinary Credentials (placeholders)
+CLOUDINARY_CLOUD_NAME=YOUR_CLOUD_NAME
+CLOUDINARY_API_KEY=YOUR_CLOUDINARY_API_KEY
+CLOUDINARY_API_SECRET=YOUR_CLOUDINARY_API_SECRET
+
+# Alternative: You can also use the URL format
+CLOUDINARY_URL=cloudinary://YOUR_CLOUDINARY_API_KEY:YOUR_CLOUDINARY_API_SECRET@YOUR_CLOUD_NAME
+
+# Comment out or remove AWS variables since they're not working
+# AWS_ACCESS_KEY_ID=YOUR_AWS_ACCESS_KEY_ID
+# AWS_REGION=eu-central-1
+# AWS_S3_BUCKET_NAME=pouchquan
+# AWS_SECRET_ACCESS_KEY=YOUR_AWS_SECRET_ACCESS_KEY

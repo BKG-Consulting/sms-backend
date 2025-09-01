@@ -1,0 +1,122 @@
+{
+  "info": {
+    "name": "MR Dashboard API",
+    "description": "API endpoints for MR dashboard functionality",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get MR Dashboard Overview",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwt_token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/dashboard/mr",
+          "host": ["{{base_url}}"],
+          "path": ["api", "dashboard", "mr"]
+        },
+        "description": "Returns comprehensive audit and document metrics for the MR's institution"
+      },
+      "response": []
+    },
+    {
+      "name": "Get MR Audit Program Growth",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwt_token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/dashboard/mr/audit-program-growth?timeFrame=monthly",
+          "host": ["{{base_url}}"],
+          "path": ["api", "dashboard", "mr", "audit-program-growth"],
+          "query": [
+            {
+              "key": "timeFrame",
+              "value": "monthly",
+              "description": "Time frame for data: monthly or yearly"
+            }
+          ]
+        },
+        "description": "Returns audit program growth data over time for chart visualization"
+      },
+      "response": []
+    },
+    {
+      "name": "Get MR Audit Activity",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwt_token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/dashboard/mr/audit-activity?timeFrame=this week",
+          "host": ["{{base_url}}"],
+          "path": ["api", "dashboard", "mr", "audit-activity"],
+          "query": [
+            {
+              "key": "timeFrame",
+              "value": "this week",
+              "description": "Time frame: this week or last week"
+            }
+          ]
+        },
+        "description": "Returns audit activity metrics and distribution by status and type"
+      },
+      "response": []
+    },
+    {
+      "name": "Get MR Document Activity",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwt_token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/dashboard/mr/document-activity?timeFrame=this week",
+          "host": ["{{base_url}}"],
+          "path": ["api", "dashboard", "mr", "document-activity"],
+          "query": [
+            {
+              "key": "timeFrame",
+              "value": "this week",
+              "description": "Time frame: this week or last week"
+            }
+          ]
+        },
+        "description": "Returns document management metrics and change request statistics"
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:4000",
+      "type": "string"
+    },
+    {
+      "key": "jwt_token",
+      "value": "your_jwt_token_here",
+      "type": "string"
+    }
+  ]
+} 

@@ -1,0 +1,34 @@
+{
+    "events": [
+        {
+            "timestamp": 1744480905948,
+            "message": "Prisma schema loaded from prisma/schema.prisma",
+            "ingestionTime": 1744480909640
+        },
+        {
+            "timestamp": 1744480906036,
+            "message": "Datasource \"db\": PostgreSQL database \"umsdb\", schema \"auth\" at \"ums-db.creckga8q3u4.eu-north-1.rds.amazonaws.com:5432\"",
+            "ingestionTime": 1744480909640
+        },
+        {
+            "timestamp": 1744480906938,
+            "message": "4 migrations found in prisma/migrations",
+            "ingestionTime": 1744480909640
+        },
+        {
+            "timestamp": 1744480907169,
+            "message": "No pending migrations to apply.",
+            "ingestionTime": 1744480909640
+        },
+        {
+            "timestamp": 1744480908647,
+            "message": "Seeding auth-service database with Super Admins...",
+            "ingestionTime": 1744480909640
+        },
+        {
+            "timestamp": 1744480909454,
+            "message": "Seeding completed successfully.",
+            "ingestionTime": 1744480909640
+        }
+    ]
+}

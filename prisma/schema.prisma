@@ -1,0 +1,1286 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tenant {
+  id                  String             @id @default(uuid())
+  name                String
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+  domain              String             @unique
+  email               String
+  accreditationNumber String?
+  createdBy           String
+  currency            String?            @default("KES")
+  establishedYear     Int?
+  logoUrl             String?
+  phone               String?
+  status              InstitutionStatus  @default(ACTIVE)
+  timezone            String?            @default("Africa/Nairobi")
+  type                InstitutionType
+  address             String?
+  analyticsId         String?
+  billingCycle        BillingCycle       @default(MONTHLY)
+  city                String?
+  contactEmail        String?
+  contactPerson       String?
+  contactPhone        String?
+  country             String?            @default("Kenya")
+  county              String?
+  customizations      Json?
+  features            Json?
+  legalName           String?
+  marketingInfo       Json?
+  maxStorageGB        Int?               @default(5)
+  maxUsers            Int?               @default(10)
+  nextBillingDate     DateTime?
+  postalCode          String?
+  registrationNumber  String?
+  socialMedia         Json?
+  subscriptionPlan    String?            @default("BASIC")
+  subscriptionStatus  SubscriptionStatus @default(ACTIVE)
+  taxId               String?
+  trackingCode        String?
+  website             String?
+  auditLogs           AuditLog[]         @relation("TenantAuditLogs")
+  auditPrograms       AuditProgram[]
+  campuses            Campus[]
+  departments         Department[]
+  documents           Document[]
+  feedbacks           Feedback[]
+  messages            Message[]
+  notifications       Notification[]
+  roles               Role[]
+  branding            TenantBranding?
+  users               User[]
+  agendaTemplates     AgendaTemplate[]
+
+  @@index([domain])
+  @@index([email])
+  @@index([status])
+  @@index([subscriptionStatus])
+  @@index([type])
+}
+
+model TenantBranding {
+  id                String   @id @default(uuid())
+  tenantId          String   @unique
+  logoUrl           String?
+  logoDarkUrl       String?
+  faviconUrl        String?
+  logoAltText       String?
+  primaryColor      String?  @default("#00A79D")
+  secondaryColor    String?  @default("#EF8201")
+  accentColor       String?
+  backgroundColor   String?
+  textColor         String?
+  fontFamily        String?  @default("Satoshi")
+  headingFontFamily String?
+  tagline           String?
+  description       String?
+  missionStatement  String?
+  visionStatement   String?
+  valueProposition  String?
+  heroTitle         String?
+  heroSubtitle      String?
+  heroImageUrl      String?
+  heroVideoUrl      String?
+  primaryCtaText    String?  @default("Get Started")
+  secondaryCtaText  String?  @default("Learn More")
+  footerText        String?
+  footerLinks       Json?
+  metaTitle         String?
+  metaDescription   String?
+  metaKeywords      String?
+  ogImageUrl        String?
+  customCss         String?
+  customJs          String?
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  tenant            Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+model Campus {
+  id          String       @id @default(uuid())
+  name        String
+  address     String?
+  city        String?
+  county      String?
+  country     String?      @default("Kenya")
+  phone       String?
+  email       String?
+  isMain      Boolean      @default(false)
+  tenantId    String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  tenant      Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  departments Department[]
+  users       User[]
+}
+
+model Department {
+  id                  String               @id @default(uuid())
+  name                String
+  code                String?
+  tenantId            String
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  campusId            String?
+  hodId               String?
+  campus              Campus?              @relation(fields: [campusId], references: [id])
+  hod                 User?                @relation("DepartmentHOD", fields: [hodId], references: [id])
+  tenant              Tenant               @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  feedbacks           Feedback[]
+  userDepartmentRoles UserDepartmentRole[]
+}
+
+model User {
+  id                              String                    @id @default(uuid())
+  email                           String                    @unique
+  password                        String
+  tenantId                        String?
+  firstName                       String
+  lastName                        String
+  campusId                        String?
+  createdAt                       DateTime                  @default(now())
+  createdBy                       String
+  updatedAt                       DateTime                  @updatedAt
+  verified                        Boolean                   @default(false)
+  auditAnalyses                   AuditAnalysis[]
+  createdFindings                 AuditFinding[]            @relation("CreatedFindings")
+  auditLogs                       AuditLog[]                @relation("UserAuditLogs")
+  createdAuditPlans               AuditPlan[]               @relation("CreatedAuditPlans")
+  planningAttendances             PlanningMeetingAttendance[]
+  createdPlanningMeetings         PlanningMeeting[]         @relation("CreatedPlanningMeetings")
+  openingMeetingAttendances       OpeningMeetingAttendance[]
+  createdOpeningMeetings          OpeningMeeting[]          @relation("CreatedOpeningMeetings")
+  closingMeetingAttendances       ClosingMeetingAttendance[]
+  createdClosingMeetings          ClosingMeeting[]          @relation("CreatedClosingMeetings")
+  createdManagementReviewMeetings ManagementReviewMeeting[] @relation("CreatedManagementReviewMeetings")
+  managementReviewAttendances     ManagementReviewAttendance[]
+  approvedAuditPrograms           AuditProgram[]            @relation("AuditProgramApprovedBy")
+  createdAuditPrograms            AuditProgram[]            @relation("AuditProgramCreatedBy")
+  auditTeamMembers                AuditTeamMember[]         @relation("AuditTeamMemberUser")
+  createdChecklists               Checklist[]               @relation("CreatedChecklists")
+  checklistAssignees              ChecklistAssignee[]
+  completedChecklistItems         ChecklistItem[]           @relation("CompletedChecklistItems")
+  complianceRecordsCreated        ComplianceRecord[]        @relation("ComplianceRecordCreatedBy")
+  assignedCorrectiveActions       CorrectiveAction[]        @relation("AssignedCorrectiveActions")
+  createdCorrectiveActions        CorrectiveAction[]        @relation("CreatedCorrectiveActions")
+  headedDepartments               Department[]              @relation("DepartmentHOD")
+  ownedDocuments                  Document[]                @relation("UserOwnedDocuments")
+  documents                       Document[]
+  approvedDocumentApprovals       DocumentApproval[]        @relation("UserApprovedDocumentApprovals")
+  requestedChangeRequests         DocumentChangeRequest[]   @relation("UserRequestedChangeRequests")
+  createdDocumentVersions         DocumentVersion[]         @relation("UserCreatedDocumentVersions")
+  feedbacks                       Feedback[]
+  improvementOpportunitiesCreated ImprovementOpportunity[]  @relation("ImprovementCreatedBy")
+  improvementOpportunitiesOwned   ImprovementOpportunity[]  @relation("ImprovementOwner")
+  loginAttempts                   LoginAttempt[]            @relation("UserLoginAttempts")
+  receivedMessages                Message[]                 @relation("ReceivedMessages")
+  sentMessages                    Message[]                 @relation("SentMessages")
+  createdNonConformities          NonConformity[]           @relation("CreatedNonConformities")
+  notifications                   Notification[]
+  otps                            OTP[]                     @relation("UserOTPs")
+  passwordHistory                 PasswordHistory[]         @relation("UserPasswordHistory")
+  refreshTokens                   RefreshToken[]
+  sessions                        Session[]                 @relation("UserSessions")
+  campus                          Campus?                   @relation(fields: [campusId], references: [id])
+  tenant                          Tenant?                   @relation(fields: [tenantId], references: [id])
+  userDepartmentRoles             UserDepartmentRole[]
+  userRoles                       UserRole[]
+  generalNotificationSent         Audit[]                   @relation("GeneralNotificationSender")
+  managementReviewInvitationsSent Audit[]                   @relation("ManagementReviewInvitationSender")
+  userPermissions                 UserPermission[]
+  grantedPermissions              UserPermission[]          @relation("PermissionGrantedBy")
+
+  @@index([tenantId])
+  @@index([campusId])
+  @@index([email])
+}
+
+model Role {
+  id                  String               @id @default(uuid())
+  name                String
+  description         String?
+  tenantId            String?
+  roleScope           String               @default("tenant") // tenant, department, hybrid
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  defaultContext      String               @default("dashboard")
+  isDefault           Boolean              @default(false)
+  isRemovable         Boolean              @default(true)
+  loginDestination    String               @default("/dashboard")
+  documentApprovals   DocumentApproval[]   @relation("RoleDocumentApprovals")
+  tenant              Tenant?              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  rolePermissions     RolePermission[]
+  userDepartmentRoles UserDepartmentRole[]
+  userRoles           UserRole[]
+
+  @@unique([tenantId, name])
+}
+
+model UserRole {
+  userId    String
+  roleId    String
+  createdAt DateTime @default(now())
+  id        String   @id @default(uuid())
+  updatedAt DateTime @updatedAt
+  isDefault Boolean  @default(false)
+  role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId])
+  @@index([userId])
+  @@index([roleId])
+}
+
+model UserDepartmentRole {
+  id                  String      @id @default(uuid())
+  userId              String
+  departmentId        String?
+  roleId              String
+  isPrimaryDepartment Boolean     @default(false)
+  isPrimaryRole       Boolean     @default(false)
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+  isDefault           Boolean     @default(false)
+  department          Department? @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  role                Role        @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  user                User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, departmentId, roleId])
+  @@index([userId])
+  @@index([departmentId])
+  @@index([roleId])
+}
+
+model Notification {
+  id           String   @id @default(uuid())
+  type         String
+  title        String
+  message      String
+  tenantId     String?
+  targetUserId String
+  link         String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  metadata     Json?
+  isRead       Boolean  @default(false)
+  targetUser   User     @relation(fields: [targetUserId], references: [id], onDelete: Cascade)
+  tenant       Tenant?  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([targetUserId])
+}
+
+model Message {
+  id          String              @id @default(uuid())
+  senderId    String
+  tenantId    String
+  subject     String?
+  body        String
+  metadata    Json?
+  isRead      Boolean             @default(false)
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  recipientId String?
+  recipient   User?               @relation("ReceivedMessages", fields: [recipientId], references: [id], onDelete: Cascade)
+  sender      User                @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  tenant      Tenant              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  attachments MessageAttachment[]
+}
+
+model Feedback {
+  id           String         @id @default(uuid())
+  tenantId     String
+  origin       FeedbackOrigin
+  category     String
+  subject      String
+  source       FeedbackSource
+  sourceDetail String?
+  departmentId String?
+  rating       Int?
+  message      String
+  createdById  String?
+  createdAt    DateTime       @default(now())
+  createdBy    User?          @relation(fields: [createdById], references: [id])
+  department   Department?    @relation(fields: [departmentId], references: [id])
+  tenant       Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+model MessageAttachment {
+  id         String   @id @default(uuid())
+  messageId  String
+  fileName   String
+  fileUrl    String
+  s3Key      String
+  uploadedAt DateTime @default(now())
+  message    Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model OTP {
+  id        String   @id @default(uuid())
+  email     String
+  code      String
+  expiresAt DateTime
+  verified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  userId    String?
+  user      User?    @relation("UserOTPs", fields: [userId], references: [id])
+
+  @@unique([email, createdAt])
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  userId       String
+  token        String   @unique
+  deviceInfo   Json?
+  ipAddress    String?
+  userAgent    String?
+  expiresAt    DateTime
+  isActive     Boolean  @default(true)
+  lastActivity DateTime @default(now())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         User     @relation("UserSessions", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+}
+
+model LoginAttempt {
+  id               String    @id @default(uuid())
+  email            String
+  ipAddress        String
+  userAgent        String?
+  success          Boolean
+  attemptTime      DateTime  @default(now())
+  lockoutExpiresAt DateTime?
+  userId           String?
+  user             User?     @relation("UserLoginAttempts", fields: [userId], references: [id])
+
+  @@index([email])
+  @@index([ipAddress])
+  @@index([attemptTime])
+}
+
+model PasswordHistory {
+  id           String   @id @default(uuid())
+  userId       String
+  passwordHash String
+  changedAt    DateTime @default(now())
+  user         User     @relation("UserPasswordHistory", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([changedAt])
+}
+
+model Document {
+  id                          String                  @id @default(uuid())
+  title                       String
+  description                 String?
+  type                        DocumentType            @default(OTHER)
+  status                      DocumentStatus          @default(DRAFT)
+  tenantId                    String
+  auditPlan                   AuditPlan?
+  ownerId                     String
+  currentVersionId            String?
+  createdAt                   DateTime                @default(now())
+  updatedAt                   DateTime                @updatedAt
+  auditId                     String?
+  userId                      String?
+  lastUpdatedViaChangeRequest DateTime?
+  isRecentlyUpdated           Boolean                 @default(false)
+  audit                       Audit?                  @relation(fields: [auditId], references: [id])
+  currentVersion              DocumentVersion?        @relation("CurrentVersion", fields: [currentVersionId], references: [id])
+  owner                       User                    @relation("UserOwnedDocuments", fields: [ownerId], references: [id], onDelete: Cascade)
+  tenant                      Tenant                  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  User                        User?                   @relation(fields: [userId], references: [id])
+  approvals                   DocumentApproval[]
+  changeRequests              DocumentChangeRequest[]
+  versions                    DocumentVersion[]       @relation("DocumentVersions")
+
+  @@unique([tenantId, title])
+  @@index([tenantId])
+  @@index([ownerId])
+  @@index([status])
+  @@index([auditId])
+}
+
+model DocumentVersion {
+  id              String                 @id @default(uuid())
+  documentId      String
+  version         Int
+  fileUrl         String
+  createdById     String
+  createdAt       DateTime               @default(now())
+  changeRequestId String?
+  s3Key           String?
+  cloudinaryId     String?
+  status          DocumentVersionStatus  @default(ACTIVE)
+  asCurrentFor    Document[]             @relation("CurrentVersion")
+  changeRequest   DocumentChangeRequest? @relation(fields: [changeRequestId], references: [id])
+  createdBy       User                   @relation("UserCreatedDocumentVersions", fields: [createdById], references: [id], onDelete: Cascade)
+  document        Document               @relation("DocumentVersions", fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@unique([documentId, version])
+  @@index([documentId])
+  @@index([createdById])
+}
+
+model DocumentChangeRequest {
+  id             String                      @id @default(uuid())
+  documentId     String
+  requestedById  String
+  description    String?
+  newFileUrl     String?
+  newVersion     Int?
+  createdAt      DateTime                    @default(now())
+  updatedAt      DateTime                    @updatedAt
+  clauseNumber   String?
+  currentClause  String?
+  justification  String?
+  proposedChange String?
+  status         DocumentChangeRequestStatus @default(UNDER_REVIEW)
+  approvals      DocumentApproval[]
+  document       Document                    @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  requestedBy    User                        @relation("UserRequestedChangeRequests", fields: [requestedById], references: [id], onDelete: Cascade)
+  versions       DocumentVersion[]
+
+  @@index([documentId])
+  @@index([requestedById])
+}
+
+model DocumentApproval {
+  id              String                 @id @default(uuid())
+  documentId      String
+  changeRequestId String?
+  approvedById    String
+  roleId          String?
+  status          DocumentStatus         @default(UNDER_REVIEW)
+  comment         String?
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+  approvedBy      User                   @relation("UserApprovedDocumentApprovals", fields: [approvedById], references: [id], onDelete: Cascade)
+  changeRequest   DocumentChangeRequest? @relation(fields: [changeRequestId], references: [id])
+  document        Document               @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  role            Role?                  @relation("RoleDocumentApprovals", fields: [roleId], references: [id])
+
+  @@index([documentId])
+  @@index([approvedById])
+  @@index([roleId])
+}
+
+model AuditProgram {
+  id              String             @id @default(uuid())
+  title           String
+  objectives      String
+  status          AuditProgramStatus @default(DRAFT)
+  tenantId        String
+  createdById     String
+  committedAt     DateTime?
+  approvedById    String?
+  approvedAt      DateTime?
+  approvalComment String?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  audits          Audit[]
+  approvedBy      User?              @relation("AuditProgramApprovedBy", fields: [approvedById], references: [id])
+  createdBy       User               @relation("AuditProgramCreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
+  tenant          Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([createdById])
+}
+
+model Audit {
+  id                        String                 @id @default(uuid())
+  auditProgramId            String
+  auditNo                   Int
+  type                      AuditType
+  auditDateFrom             DateTime?
+  auditDateTo               DateTime?
+  teamLeaderAppointmentDate DateTime?
+  teamMemberAppointmentDate DateTime?
+  followUpDateFrom          DateTime?
+  followUpDateTo            DateTime?
+  managementReviewDateFrom  DateTime?
+  managementReviewDateTo    DateTime?
+  status                    AuditStatus            @default(OPEN)
+  createdAt                 DateTime               @default(now())
+  updatedAt                 DateTime               @updatedAt
+  criteria                  String[]
+  methods                   String[]
+  objectives                String[]
+  scope                     String[]
+  notes                     String?
+  requirements              String?
+  timetable                 Json?
+  // Notification tracking fields
+  generalNotificationSentAt DateTime?
+  generalNotificationSentBy String?
+  // Management Review invitation tracking
+  managementReviewInvitationSentAt DateTime?
+  managementReviewInvitationSentBy String?
+  auditProgram              AuditProgram           @relation(fields: [auditProgramId], references: [id], onDelete: Cascade)
+  auditAnalyses             AuditAnalysis[]
+  findings                  AuditFinding[]
+  auditPlans                AuditPlan?
+  planningMeetings          PlanningMeeting[]
+  openingMeetings           OpeningMeeting[]
+  closingMeetings           ClosingMeeting[]
+  managementReviewMeetings  ManagementReviewMeeting[]
+  teamMembers               AuditTeamMember[]
+  checklists                Checklist[]
+  documents                 Document[]
+  // Relation to track who sent the notification
+  generalNotificationSender User?                  @relation("GeneralNotificationSender", fields: [generalNotificationSentBy], references: [id])
+  // Relation to track who sent the management review invitation
+  managementReviewInvitationSender User?           @relation("ManagementReviewInvitationSender", fields: [managementReviewInvitationSentBy], references: [id])
+
+  @@unique([auditProgramId, auditNo])
+  @@index([auditProgramId])
+  @@index([status])
+  @@index([generalNotificationSentAt])
+}
+
+model AuditTeamMember {
+  id            String           @id @default(uuid())
+  auditId       String
+  userId        String
+  appointedAt   DateTime?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  role          String
+  declineReason String?
+  responseAt    DateTime?
+  status        TeamMemberStatus @default(PENDING)
+  audit         Audit            @relation(fields: [auditId], references: [id], onDelete: Cascade)
+  user          User             @relation("AuditTeamMemberUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([auditId, userId])
+  @@index([auditId])
+  @@index([userId])
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  action     String
+  entityType String
+  entityId   String
+  userId     String
+  tenantId   String?
+  details    String?
+  metadata   Json?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+  tenant     Tenant?  @relation("TenantAuditLogs", fields: [tenantId], references: [id], onDelete: Cascade)
+  user       User     @relation("UserAuditLogs", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([entityType])
+  @@index([entityId])
+  @@index([userId])
+  @@index([tenantId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+// Planning Meeting Models - Independent Domain
+model PlanningMeeting {
+  id          String                    @id @default(uuid())
+  auditId     String
+  scheduledAt DateTime                  @default(now())
+  createdById String
+  notes       String?
+  createdAt   DateTime                  @default(now())
+  updatedAt   DateTime                  @updatedAt
+  status      PlanningMeetingStatus     @default(UPCOMING)
+  archived    Boolean                   @default(false)
+  venue       String?
+  agendas     PlanningMeetingAgenda[]
+  attendances PlanningMeetingAttendance[]
+  audit       Audit                     @relation(fields: [auditId], references: [id], onDelete: Cascade)
+  createdBy   User                      @relation("CreatedPlanningMeetings", fields: [createdById], references: [id], onDelete: Cascade)
+}
+
+model PlanningMeetingAttendance {
+  id        String               @id @default(uuid())
+  meetingId String
+  userId    String
+  present   Boolean              @default(false)
+  remarks   String?
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+  meeting   PlanningMeeting      @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  user      User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([meetingId, userId])
+}
+
+model PlanningMeetingAgenda {
+  id         String               @id @default(uuid())
+  meetingId  String
+  agendaText String
+  order      Int
+  createdAt  DateTime             @default(now())
+  updatedAt  DateTime             @updatedAt
+  discussed  Boolean              @default(false)
+  notes      String?
+  meeting    PlanningMeeting      @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+}
+
+// New Meeting Models - Type Specific
+model OpeningMeeting {
+  id          String                    @id @default(uuid())
+  auditId     String
+  scheduledAt DateTime                  @default(now())
+  createdById String
+  notes       String?
+  createdAt   DateTime                  @default(now())
+  updatedAt   DateTime                  @updatedAt
+  status      MeetingStatus             @default(UPCOMING)
+  archived    Boolean                   @default(false)
+  venue       String?
+  agendas     OpeningMeetingAgenda[]
+  attendances OpeningMeetingAttendance[]
+  audit       Audit                     @relation(fields: [auditId], references: [id], onDelete: Cascade)
+  createdBy   User                      @relation("CreatedOpeningMeetings", fields: [createdById], references: [id], onDelete: Cascade)
+}
+
+model OpeningMeetingAttendance {
+  id        String           @id @default(uuid())
+  meetingId String
+  userId    String
+  present   Boolean
+  remarks   String?
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  meeting   OpeningMeeting   @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([meetingId, userId])
+}
+
+model OpeningMeetingAgenda {
+  id         String           @id @default(uuid())
+  meetingId  String
+  agendaText String
+  order      Int
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+  discussed  Boolean          @default(false)
+  notes      String?
+  meeting    OpeningMeeting   @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+}
+
+model ClosingMeeting {
+  id          String                    @id @default(uuid())
+  auditId     String
+  scheduledAt DateTime                  @default(now())
+  createdById String
+  notes       String?
+  createdAt   DateTime                  @default(now())
+  updatedAt   DateTime                  @updatedAt
+  status      MeetingStatus             @default(UPCOMING)
+  archived    Boolean                   @default(false)
+  venue       String?
+  agendas     ClosingMeetingAgenda[]
+  attendances ClosingMeetingAttendance[]
+  audit       Audit                     @relation(fields: [auditId], references: [id], onDelete: Cascade)
+  createdBy   User                      @relation("CreatedClosingMeetings", fields: [createdById], references: [id], onDelete: Cascade)
+}
+
+model ClosingMeetingAttendance {
+  id        String           @id @default(uuid())
+  meetingId String
+  userId    String
+  present   Boolean
+  remarks   String?
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  meeting   ClosingMeeting   @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([meetingId, userId])
+}
+
+model ClosingMeetingAgenda {
+  id         String           @id @default(uuid())
+  meetingId  String
+  agendaText String
+  order      Int
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+  discussed  Boolean          @default(false)
+  notes      String?
+  meeting    ClosingMeeting   @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+}
+
+// Management Review Meeting Models
+model ManagementReviewMeeting {
+  id          String                           @id @default(uuid())
+  auditId     String
+  scheduledAt DateTime                         @default(now())
+  createdById String
+  notes       String?
+  createdAt   DateTime                         @default(now())
+  updatedAt   DateTime                         @updatedAt
+  status      ManagementReviewMeetingStatus   @default(UPCOMING)
+  archived    Boolean                          @default(false)
+  venue       String?
+  minutes     ManagementReviewMinute[]
+  attendances ManagementReviewAttendance[]
+  audit       Audit                            @relation(fields: [auditId], references: [id], onDelete: Cascade)
+  createdBy   User                             @relation("CreatedManagementReviewMeetings", fields: [createdById], references: [id], onDelete: Cascade)
+}
+
+model ManagementReviewAttendance {
+  id        String                    @id @default(uuid())
+  meetingId String
+  userId    String
+  present   Boolean                   @default(false)
+  remarks   String?
+  createdAt DateTime                  @default(now())
+  updatedAt DateTime                  @updatedAt
+  meeting   ManagementReviewMeeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  user      User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([meetingId, userId])
+}
+
+model ManagementReviewMinute {
+  id        String                    @id @default(uuid())
+  meetingId String
+  title     String                    // e.g., "MIN 1: PRELIMINARIES"
+  order     Int                       // e.g., 1, 2, 3...
+  notes     String?                   // Rich text notes for this minute
+  discussed Boolean                   @default(false)
+  createdAt DateTime                  @default(now())
+  updatedAt DateTime                  @updatedAt
+  meeting   ManagementReviewMeeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+}
+
+model AuditPlan {
+  id               String          @id @default(uuid())
+  auditId          String          @unique
+  createdById      String
+  title            String
+  description      String?
+  objectives       String[]
+  documentId       String?         @unique
+  document         Document?       @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  scope            String[]
+  criteria         String[]
+  methods          String[]
+  plannedStartDate DateTime?
+  plannedEndDate   DateTime?
+  actualStartDate  DateTime?
+  actualEndDate    DateTime?
+  status           AuditPlanStatus @default(DRAFT)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  notes            String?
+  requirements     String?
+  timetable        Json?
+  audit            Audit           @relation(fields: [auditId], references: [id], onDelete: Cascade)
+  createdBy        User            @relation("CreatedAuditPlans", fields: [createdById], references: [id], onDelete: Cascade)
+}
+
+model AuditFinding {
+  id                       String                  @id @default(uuid())
+  createdById              String
+  title                    String
+  description              String
+  category                 FindingCategory?
+  department               String
+  attachments              String[]
+  createdAt                DateTime                @default(now())
+  updatedAt                DateTime                @updatedAt
+  auditId                  String
+  checklistId              String?                 // ← NEW: Direct link to checklist
+  criteria                 String
+  hodFeedback              String?
+  status                   FindingApprovalStatus   @default(PENDING)
+  reviewed                 Boolean                 @default(false)
+  reviewedAt               DateTime?
+  categorizationFinished   Boolean                 @default(false)
+  categorizationFinishedAt DateTime?
+  audit                    Audit                   @relation(fields: [auditId], references: [id], onDelete: Cascade)
+  checklist                Checklist?              @relation("ChecklistFindings", fields: [checklistId], references: [id], onDelete: SetNull) // ← NEW: Direct relationship
+  createdBy                User                    @relation("CreatedFindings", fields: [createdById], references: [id], onDelete: Cascade)
+  compliance               ComplianceRecord?       @relation("FindingCompliance")
+  improvements             ImprovementOpportunity? @relation("FindingImprovement")
+  nonConformities          NonConformity[]         @relation("FindingNonConformities")
+}
+
+model NonConformity {
+  id                String                @id @default(uuid())
+  findingId         String
+  createdById       String
+  title             String
+  description       String
+  clauseNumber      String?
+  type              NonConformityType
+  severity          NonConformitySeverity
+  rootCause         String?
+  status            NonConformityStatus   @default(OPEN)
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
+  correctiveActions CorrectiveAction[]
+  createdBy         User                  @relation("CreatedNonConformities", fields: [createdById], references: [id], onDelete: Cascade)
+  finding           AuditFinding          @relation("FindingNonConformities", fields: [findingId], references: [id], onDelete: Cascade)
+}
+
+model CorrectiveAction {
+  id                    String                   @id @default(uuid())
+  nonConformityId       String
+  assignedToId          String?
+  createdById           String
+  title                 String
+  description           String
+  actionType            CorrectiveActionType
+  priority              CorrectiveActionPriority
+  dueDate               DateTime?
+  completedDate         DateTime?
+  status                CorrectiveActionStatus   @default(OPEN)
+  progress              Int                      @default(0)
+  createdAt             DateTime                 @default(now())
+  updatedAt             DateTime                 @updatedAt
+  correctionRequirement Json?
+  proposedAction        Json?
+  appropriatenessReview Json?
+  followUpAction        Json?
+  actionEffectiveness   Json?
+  mrNotified            Boolean                  @default(false)
+  assignedTo            User?                    @relation("AssignedCorrectiveActions", fields: [assignedToId], references: [id])
+  createdBy             User                     @relation("CreatedCorrectiveActions", fields: [createdById], references: [id], onDelete: Cascade)
+  nonConformity         NonConformity            @relation(fields: [nonConformityId], references: [id], onDelete: Cascade)
+}
+
+model ComplianceRecord {
+  id          String           @id @default(uuid())
+  findingId   String           @unique
+  status      ComplianceStatus @default(COMPLIANT)
+  evidence    String?
+  notes       String?
+  createdById String
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  createdBy   User             @relation("ComplianceRecordCreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
+  finding     AuditFinding     @relation("FindingCompliance", fields: [findingId], references: [id], onDelete: Cascade)
+}
+
+model ImprovementOpportunity {
+  id                     String            @id @default(uuid())
+  findingId              String            @unique
+  opportunity            String
+  actionPlan             String?
+  ownerId                String?
+  status                 ImprovementStatus @default(OPEN)
+  dueDate                DateTime?
+  completedAt            DateTime?
+  createdById            String
+  createdAt              DateTime          @default(now())
+  updatedAt              DateTime          @updatedAt
+  observationRequirement Json?
+  proposedAction         Json?
+  actionEffectiveness    Json?
+  appropriatenessReview  Json?
+  followUpAction         Json?
+  mrNotified             Boolean           @default(false)
+  createdBy              User              @relation("ImprovementCreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
+  finding                AuditFinding      @relation("FindingImprovement", fields: [findingId], references: [id], onDelete: Cascade)
+  owner                  User?             @relation("ImprovementOwner", fields: [ownerId], references: [id])
+}
+
+model Checklist {
+  id          String              @id @default(uuid())
+  createdById String
+  title       String
+  description String?
+  type        ChecklistType
+  department  String?
+  status      ChecklistStatus     @default(ACTIVE)
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  auditId     String
+  audit       Audit               @relation(fields: [auditId], references: [id], onDelete: Cascade)
+  createdBy   User                @relation("CreatedChecklists", fields: [createdById], references: [id], onDelete: Cascade)
+  assignees   ChecklistAssignee[]
+  items       ChecklistItem[]
+  findings    AuditFinding[]      @relation("ChecklistFindings") // ← NEW: Direct relationship to findings
+}
+
+model ChecklistItem {
+  id            String    @id @default(uuid())
+  checklistId   String
+  completedById String?
+  title         String
+  description   String?
+  clauseNumber  String?
+  isRequired    Boolean   @default(true)
+  order         Int
+  completed     Boolean   @default(false)
+  completedAt   DateTime?
+  notes         String?
+  evidence      String?
+  attachments   String[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  checklist     Checklist @relation(fields: [checklistId], references: [id], onDelete: Cascade)
+  completedBy   User?     @relation("CompletedChecklistItems", fields: [completedById], references: [id])
+
+  @@index([checklistId])
+  @@index([completed])
+}
+
+model ChecklistAssignee {
+  id          String    @id @default(uuid())
+  checklistId String
+  userId      String
+  assignedAt  DateTime  @default(now())
+  checklist   Checklist @relation(fields: [checklistId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([checklistId, userId])
+  @@index([userId])
+}
+
+model AuditAnalysis {
+  id            String    @id @default(uuid())
+  auditId       String
+  department    String    @default("")
+  submittedById String
+  metrics       Json
+  remarks       String
+  finished      Boolean   @default(false)
+  finishedAt    DateTime?
+  mrNotified    Boolean   @default(false)
+  mrNotifiedAt  DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  audit         Audit     @relation(fields: [auditId], references: [id], onDelete: Cascade)
+  submittedBy   User      @relation(fields: [submittedById], references: [id], onDelete: Cascade)
+
+  @@unique([auditId, department])
+}
+
+model Permission {
+  id              String           @id @default(uuid())
+  module          String
+  action          String
+  description     String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  rolePermissions RolePermission[]
+  userPermissions UserPermission[]
+
+  @@unique([module, action], name: "module_action")
+}
+
+model RolePermission {
+  id           String     @id @default(uuid())
+  roleId       String
+  permissionId String
+  allowed      Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+}
+
+// User-Specific Permissions - Allows direct permission assignment to users
+model UserPermission {
+  id            String     @id @default(uuid())
+  userId        String
+  permissionId  String
+  allowed       Boolean    @default(true)
+  grantedBy     String? // Who granted this permission
+  grantedAt     DateTime   @default(now())
+  expiresAt     DateTime? // Optional expiration
+  reason        String? // Why this permission was granted
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  permission    Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  grantedByUser User?      @relation("PermissionGrantedBy", fields: [grantedBy], references: [id])
+
+  @@unique([userId, permissionId])
+  @@index([userId])
+  @@index([permissionId])
+  @@index([expiresAt])
+}
+
+model AgendaTemplate {
+  id          String                    @id @default(uuid())
+  name        String                    // e.g., "Opening Meeting Agendas", "Closing Meeting Agendas"
+  type        MeetingType              // OPENING, CLOSING, etc.
+  tenantId    String
+  isActive    Boolean                   @default(true)
+  createdAt   DateTime                  @default(now())
+  updatedAt   DateTime                  @updatedAt
+  items       AgendaTemplateItem[]
+  tenant      Tenant                    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+model AgendaTemplateItem {
+  id              String           @id @default(uuid())
+  templateId      String
+  agendaText      String
+  order           Int
+  isRequired      Boolean          @default(true)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  template        AgendaTemplate    @relation(fields: [templateId], references: [id], onDelete: Cascade)
+}
+
+enum InstitutionType {
+  UNIVERSITY
+  COLLEGE
+  SCHOOL
+  INSTITUTE
+  OTHER
+}
+
+enum InstitutionStatus {
+  ACTIVE
+  INACTIVE
+  PENDING
+}
+
+enum DocumentStatus {
+  DRAFT
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  OBSOLETE
+  PUBLISHED
+}
+
+enum DocumentType {
+  POLICY
+  PROCEDURE
+  FORM
+  RECORD
+  OTHER
+  AUDIT_REPORT
+  AUDIT_PLAN
+}
+
+enum AuditProgramStatus {
+  DRAFT
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+}
+
+enum AuditType {
+  FIRST_INTERNAL
+  FIRST_SURVEILLANCE
+  SECOND_INTERNAL
+  SECOND_SURVEILLANCE
+  THIRD_INTERNAL
+  RECERTIFICATION
+}
+
+enum AuditStatus {
+  OPEN
+  COMPLETED
+  CANCELLED
+}
+
+enum TeamMemberStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
+enum MeetingStatus {
+  UPCOMING
+  ACTIVE
+  COMPLETED
+}
+
+enum PlanningMeetingStatus {
+  UPCOMING
+  ACTIVE
+  COMPLETED
+}
+
+enum ManagementReviewMeetingStatus {
+  UPCOMING
+  ACTIVE
+  COMPLETED
+}
+
+enum MeetingType {
+  PLANNING
+  OPENING
+  CLOSING
+  MANAGEMENT_REVIEW
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  SUSPENDED
+  CANCELLED
+  EXPIRED
+  TRIAL
+  PENDING
+}
+
+enum BillingCycle {
+  MONTHLY
+  QUARTERLY
+  YEARLY
+  CUSTOM
+}
+
+enum SubscriptionPlan {
+  BASIC
+  PROFESSIONAL
+  ENTERPRISE
+  CUSTOM
+}
+
+enum FeedbackOrigin {
+  INTERNAL
+  EXTERNAL
+}
+
+enum FeedbackSource {
+  ANONYMOUS
+  USER
+  OTHER
+}
+
+enum ComplianceStatus {
+  COMPLIANT
+  NON_COMPLIANT
+  PARTIALLY_COMPLIANT
+}
+
+enum ImprovementStatus {
+  OPEN
+  IN_PROGRESS
+  COMPLETED
+  CLOSED
+}
+
+enum AuditPlanStatus {
+  DRAFT
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  SUBMITTED
+  APPROVED
+  REJECTED
+}
+
+enum FindingApprovalStatus {
+  PENDING
+  ACCEPTED
+  REFUSED
+  UNDER_REVIEW
+}
+
+enum FindingCategory {
+  COMPLIANCE
+  IMPROVEMENT
+  NON_CONFORMITY
+}
+
+enum NonConformityType {
+  MAJOR
+  MINOR
+  OBSERVATION
+}
+
+enum NonConformitySeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum NonConformityStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum CorrectiveActionType {
+  CORRECTIVE
+  PREVENTIVE
+  IMPROVEMENT
+}
+
+enum CorrectiveActionPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum CorrectiveActionStatus {
+  OPEN
+  IN_PROGRESS
+  COMPLETED
+  VERIFIED
+  CLOSED
+}
+
+enum ChecklistType {
+  PRE_AUDIT
+  DURING_AUDIT
+  POST_AUDIT
+  COMPLIANCE
+  DEPARTMENT_SPECIFIC
+  ISO_CLAUSE
+  GENERAL
+}
+
+enum ChecklistStatus {
+  ACTIVE
+  COMPLETED
+  ARCHIVED
+  CANCELLED
+}
+
+enum DocumentChangeRequestStatus {
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  APPLIED
+}
+
+enum DocumentVersionStatus {
+  ACTIVE
+  ARCHIVED
+  OBSOLETE
+}
+
+
+

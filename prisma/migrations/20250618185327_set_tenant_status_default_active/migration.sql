@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Tenant" ALTER COLUMN "status" SET DEFAULT 'ACTIVE';

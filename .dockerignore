@@ -1,0 +1,21 @@
+# Ignore node_modules directory (we'll install dependencies during build)
+node_modules/
+
+# Ignore environment variable files (not to include sensitive data in the image)
+.env
+
+# Ignore log files
+*.log
+
+# Ignore any temporary or build directories
+build/
+dist/
+
+# Ignore Dockerfile (we don't want Docker to copy itself)
+Dockerfile
+
+# Ignore the .dockerignore itself (we don't want to include it in the image)
+.dockerignore
+
+# If you have tests, you may want to ignore them too
+test/

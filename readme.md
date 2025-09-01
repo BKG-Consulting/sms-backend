@@ -1,0 +1,7 @@
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/postgres?schema=public"
+CLIENT_URL=http://localhost:3000
+PORT=4000
+EMAIL=info@dualdimension.org
+EMAIL_PASSWORD=wpsyasogkltehpur
+ACCESS_TOKEN_SECRET=a8f2b91a87c3a6b7e4d8f19ab6c4e5e2f3d6c9b1d2a8e7f6a4b3c9d8e1f2g5h6
+REFRESH_TOKEN_SECRET=b7d9e3c6f8a5b2c4d1e9f7a6b3c8e2f5g1d4h9a7e3c2b6f5g8d1e4c3b

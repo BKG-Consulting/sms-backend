@@ -1,0 +1,281 @@
+{
+  "info": {
+    "name": "System Admin Dashboard API Testing",
+    "description": "Collection for testing System Admin dashboard endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login as System Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"systemadmin@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.accessToken) {",
+                  "        pm.collectionVariables.set('accessToken', response.accessToken);",
+                  "        console.log('Access token set:', response.accessToken);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Current User (Verify Token)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "me"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "System Admin Dashboard",
+      "item": [
+        {
+          "name": "Get System Admin Dashboard Metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/system-admin",
+              "host": ["{{baseUrl}}"],
+              "path": ["dashboard", "system-admin"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has success property', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('Response has data property', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.data).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test('Dashboard data contains required metrics', function () {",
+                  "    const response = pm.response.json();",
+                  "    const data = response.data;",
+                  "    ",
+                  "    pm.expect(data).to.have.property('totalUsers');",
+                  "    pm.expect(data).to.have.property('activeUsers');",
+                  "    pm.expect(data).to.have.property('totalDepartments');",
+                  "    pm.expect(data).to.have.property('totalCampuses');",
+                  "    pm.expect(data).to.have.property('recentUsers');",
+                  "    pm.expect(data).to.have.property('userGrowth');",
+                  "    ",
+                  "    pm.expect(data.totalUsers).to.be.a('number');",
+                  "    pm.expect(data.activeUsers).to.be.a('number');",
+                  "    pm.expect(data.totalDepartments).to.be.a('number');",
+                  "    pm.expect(data.totalCampuses).to.be.a('number');",
+                  "    pm.expect(data.recentUsers).to.be.an('array');",
+                  "    pm.expect(data.userGrowth).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Recent users have required fields', function () {",
+                  "    const response = pm.response.json();",
+                  "    const recentUsers = response.data.recentUsers;",
+                  "    ",
+                  "    if (recentUsers.length > 0) {",
+                  "        const user = recentUsers[0];",
+                  "        pm.expect(user).to.have.property('id');",
+                  "        pm.expect(user).to.have.property('email');",
+                  "        pm.expect(user).to.have.property('firstName');",
+                  "        pm.expect(user).to.have.property('lastName');",
+                  "        pm.expect(user).to.have.property('verified');",
+                  "        pm.expect(user).to.have.property('createdAt');",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get System Admin Dashboard - Unauthorized (No Token)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/system-admin",
+              "host": ["{{baseUrl}}"],
+              "path": ["dashboard", "system-admin"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 401 for unauthorized access', function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get System Admin Dashboard - Wrong Role (Super Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/system-admin",
+              "host": ["{{baseUrl}}"],
+              "path": ["dashboard", "system-admin"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 403 for wrong role', function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Sample Data Setup",
+      "item": [
+        {
+          "name": "Create Test Tenant",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tenant\": {\n    \"name\": \"Test University\",\n    \"domain\": \"testuniversity.com\",\n    \"email\": \"admin@testuniversity.com\",\n    \"type\": \"University\",\n    \"phone\": \"+1234567890\",\n    \"accreditationNumber\": \"ACC123456\",\n    \"establishedYear\": 1990,\n    \"timezone\": \"UTC\",\n    \"currency\": \"USD\",\n    \"address\": \"123 Test Street\",\n    \"city\": \"Test City\",\n    \"county\": \"Test County\",\n    \"country\": \"Test Country\"\n  },\n  \"adminUser\": {\n    \"email\": \"systemadmin@testuniversity.com\",\n    \"firstName\": \"System\",\n    \"lastName\": \"Admin\",\n    \"password\": \"password123\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tenants",
+              "host": ["{{baseUrl}}"],
+              "path": ["tenants"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login as Test System Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"systemadmin@testuniversity.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.accessToken) {",
+                  "        pm.collectionVariables.set('accessToken', response.accessToken);",
+                  "        console.log('Test system admin access token set:', response.accessToken);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+} 
